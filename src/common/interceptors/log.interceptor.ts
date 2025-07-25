@@ -2,12 +2,15 @@ import {
     CallHandler,
     ExecutionContext,
     Injectable,
+    Logger,
     NestInterceptor,
 } from '@nestjs/common';
 import { catchError, Observable, tap, throwError } from 'rxjs';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
+    private readonly logger: Logger = new Logger('HTTP');
+
     intercept(
         context: ExecutionContext,
         next: CallHandler<any>,
@@ -20,10 +23,10 @@ export class LoggingInterceptor implements NestInterceptor {
         return next.handle().pipe(
             tap(() => {
                 const response = context.switchToHttp().getResponse();
-                const statusCode = response.status;
+                const statusCode = response.statusCode;
                 const delay = Date.now() - now;
 
-                console.log(`${method} ${url} ${statusCode} ${delay}ms`);
+                this.logger.log(`${method} ${url} ${statusCode} ${delay}ms`);
             }),
             catchError((error) => {
                 const delay = Date.now() - now;
@@ -33,7 +36,7 @@ export class LoggingInterceptor implements NestInterceptor {
                     ? JSON.stringify(error.response)
                     : '';
 
-                console.log(
+                this.logger.error(
                     `${method} ${url} ${statusCode} ${delay}ms - Error ${errorMessage} - Details ${errorResponse}`,
                 );
                 return new Observable<never>((subscriber) =>
