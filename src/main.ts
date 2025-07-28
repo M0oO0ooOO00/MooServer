@@ -3,9 +3,14 @@ import { AppModule } from './app.module';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { SwaggerConfig } from './common/config/swagger.config';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+
+    // config service
+    const cofigService = app.get(ConfigService);
+    const port = cofigService.get<number>('PORT') ?? 3000;
 
     // RestResponse Interceptor
     app.useGlobalInterceptors(new ResponseInterceptor());
@@ -16,6 +21,6 @@ async function bootstrap() {
     // swagger-config
     SwaggerConfig.setUp(app);
 
-    await app.listen(process.env.PORT ?? 3030);
+    await app.listen(port ?? 3030);
 }
 bootstrap();
