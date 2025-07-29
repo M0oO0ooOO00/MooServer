@@ -4,10 +4,16 @@ import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './common/interceptors/log.interceptor';
 import { ConfigModule } from '@nestjs/config';
+import { DbModule } from './common/db/db.module';
+import { MemberModule } from './member/member.module';
 import databaseConfig from './common/config/database.config';
 
 @Module({
-    imports: [ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] })],
+    imports: [
+        ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] }),
+        DbModule,
+        MemberModule,
+    ],
     controllers: [AppController],
     providers: [
         AppService,

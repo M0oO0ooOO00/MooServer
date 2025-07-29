@@ -1,26 +1,25 @@
-import { Global, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Client } from 'pg';
-import * as schema from './schema';
 
-const client = new Client({
-    host: process.env.DB_HOST ?? 'localhost',
-    port: parseInt(process.env.DB_PORT ?? '5432', 10),
-    user: process.env.DB_USERNAME ?? '',
-    password: process.env.DB_PASSWORD ?? '',
-    database: process.env.DB_NAME ?? '',
-});
-
-const db = drizzle(client, { schema });
-
-@Global()
 @Module({
     providers: [
         {
             provide: 'DRIZZLE',
-            useFactory: async () => {
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => {
+                const client = new Client({
+                    host: configService.get<string>('DB_HOST'),
+                    port: configService.get<number>('DB_PORT'),
+                    user: configService.get<string>('DB_USERNAME'),
+                    password: configService.get<string>('DB_PASSWORD'),
+                    database: configService.get<string>('DB_NAME'),
+                });
+
                 await client.connect();
-                return db;
+
+                return drizzle(client);
             },
         },
     ],
