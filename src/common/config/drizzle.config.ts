@@ -1,7 +1,4 @@
 import type { Config } from 'drizzle-kit';
-import * as dotenv from 'dotenv';
-
-dotenv.config(); // .env 파일 로드
 
 export default {
     schema: './src/**/*.entity.ts',
