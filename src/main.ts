@@ -9,8 +9,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
     // config service
-    const cofigService = app.get(ConfigService);
-    const port = cofigService.get<number>('PORT') ?? 3000;
+    const configService = app.get(ConfigService);
+    const port = configService.get<number>('PORT') ?? 3000;
 
     // RestResponse Interceptor
     app.useGlobalInterceptors(new ResponseInterceptor());
