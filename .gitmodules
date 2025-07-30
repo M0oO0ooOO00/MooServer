@@ -1,0 +1,3 @@
+[submodule "secret"]
+	path = secret
+	url = https://github.com/M0oO0ooOO00/MooSecret.git

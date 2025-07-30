@@ -7,10 +7,15 @@ import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './common/db/db.module';
 import { MemberModule } from './member/member.module';
 import databaseConfig from './common/config/database.config';
+import * as path from 'path';
 
 @Module({
     imports: [
-        ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] }),
+        ConfigModule.forRoot({
+            envFilePath: [path.resolve(__dirname, '../secret/.env')],
+            isGlobal: true,
+            load: [databaseConfig],
+        }),
         DbModule,
         MemberModule,
     ],
