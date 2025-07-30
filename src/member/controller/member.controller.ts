@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { MemberService } from './member.service';
-import { CreateMemberDto } from './dto/create-member.dto';
+import { MemberService } from '../service/member.service';
+import { CreateMemberDto } from '../dto/create-member.dto';
 
 @Controller('member')
 export class MemberController {

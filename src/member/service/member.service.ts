@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MemberRepository } from './member.repository';
+import { MemberRepository } from '../repository/member.repository';
 
 @Injectable()
 export class MemberService {
