@@ -1,14 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { Member } from './domain/member.entity';
+import { Member } from '../domain/member.entity';
+import { DATABASE_CONNECTION } from '../../common/db/constants/database-connection';
 
 type Member = typeof Member.$inferSelect;
 
 @Injectable()
 export class MemberRepository {
     constructor(
-        @Inject('DRIZZLE') private readonly db: ReturnType<typeof drizzle>,
+        @Inject(DATABASE_CONNECTION)
+        private readonly db: ReturnType<typeof drizzle>,
     ) {}
 
     async findAll(): Promise<Member[]> {
