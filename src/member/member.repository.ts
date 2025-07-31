@@ -25,6 +25,16 @@ export class MemberRepository {
         return result[0] ?? null;
     }
 
+    async findOneByEmail(email: string): Promise<Member> {
+        const result = await this.db
+            .select()
+            .from(Member)
+            .where(eq(Member.email, email))
+            .limit(1);
+
+        return result[0] ?? null;
+    }
+
     async create(name: string, email: string): Promise<void> {
         try {
             await this.db.insert(Member).values({ name, email });

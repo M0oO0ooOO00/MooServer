@@ -3,16 +3,20 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 import { MemberModule } from 'src/member/member.module';
+import { AuthService } from './auth.service';
+import { AuthController } from './auth.controller';
+import { KakaoStrategy } from './strategies/kakao.strategy';
 
 @Module({
     imports: [
         JwtModule.register({
             secret: process.env.JWT_SECRET,
-            signOptions: {expiresIn: '1d'},
+            signOptions: { expiresIn: '1d' },
         }),
         MemberModule,
     ],
-    providers: [JwtStrategy, JwtAuthGuard],
+    providers: [JwtStrategy, JwtAuthGuard, AuthService, KakaoStrategy],
     exports: [JwtAuthGuard],
+    controllers: [AuthController],
 })
 export class AuthModule {}

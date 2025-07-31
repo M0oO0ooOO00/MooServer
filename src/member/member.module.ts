@@ -7,7 +7,7 @@ import { DbModule } from '../common/db/db.module';
 @Module({
     imports: [DbModule],
     providers: [MemberService, MemberRepository],
-    exports: [MemberService],
+    exports: [MemberService, MemberRepository],
     controllers: [MemberController],
 })
 export class MemberModule {}
