@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { LoggingInterceptor } from './common/interceptors/log.interceptor';
 import { ConfigModule } from '@nestjs/config';
@@ -13,7 +11,7 @@ import * as path from 'path';
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: [path.resolve(__dirname, '../secret/.env')],
+            envFilePath: [path.resolve(process.cwd(), '../secret/.env')],
             isGlobal: true,
             load: [databaseConfig],
         }),
@@ -21,9 +19,7 @@ import * as path from 'path';
         MemberModule,
         AuthModule,
     ],
-    controllers: [AppController],
     providers: [
-        AppService,
         { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
     ],
 })
