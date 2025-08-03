@@ -11,7 +11,7 @@ import * as path from 'path';
 @Module({
     imports: [
         ConfigModule.forRoot({
-            envFilePath: [path.resolve(process.cwd(), '../secret/.env')],
+            envFilePath: [path.resolve(process.cwd(), 'secret/.env')],
             isGlobal: true,
             load: [databaseConfig],
         }),
