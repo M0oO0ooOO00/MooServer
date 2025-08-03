@@ -11,22 +11,16 @@ import * as schema from './schema';
             provide: DATABASE_CONNECTION,
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => {
-                // const dbConfig = {
-                //     host: configService.get<string>('DB_HOST'),
-                //     port: configService.get<number>('DB_PORT'),
-                //     user: configService.get<string>('DB_USERNAME'),
-                //     password: configService.get<string>('DB_PASSWORD'),
-                //     database: configService.get<string>('DB_NAME'),
-                // };
-                //
-                // const client = new Client(dbConfig);
-                //
-                // await client.connect();
-                //
-                // return drizzle(client);
+                const isMigrating =
+                    configService.get<string>('DB_MIGRATING') === 'true';
+                const isSeeding =
+                    configService.get<string>('DB_SEEDING') === 'true';
+
                 const pool = new Pool({
                     connectionString: configService.getOrThrow('DATABASE_URL'),
+                    max: isMigrating || isSeeding ? 1 : 10,
                 });
+
                 return drizzle(pool, {
                     schema,
                 });
@@ -35,5 +29,4 @@ import * as schema from './schema';
     ],
     exports: [DATABASE_CONNECTION],
 })
-export class DbModule {
-}
+export class DbModule {}
