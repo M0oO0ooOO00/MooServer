@@ -19,8 +19,6 @@ import * as path from 'path';
         MemberModule,
         AuthModule,
     ],
-    providers: [
-        { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
-    ],
+    providers: [{ provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })
 export class AppModule {}
