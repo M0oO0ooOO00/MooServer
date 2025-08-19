@@ -27,9 +27,13 @@ export class MemberRepository {
         return result[0] ?? null;
     }
 
-    async create(name: string, email: string): Promise<void> {
+    async create(member: Member): Promise<Member> {
         try {
-            await this.db.insert(Member).values({ name, email });
+            const result = await this.db
+                .insert(Member)
+                .values(member)
+                .returning();
+            return result[0];
         } catch (error) {
             console.error('DB query error:', error);
             throw error;
