@@ -16,6 +16,6 @@ export class MemberService {
     }
 
     async createMember(name: string, email: string) {
-        await this.memberRepository.create(name, email);
+        // await this.memberRepository.create(name, email);
     }
 }

@@ -9,7 +9,7 @@ export class MemberController {
     @Post()
     async signUp(@Body() createMemberDto: CreateMemberDto) {
         const { name, email } = createMemberDto;
-
+        // TODO : 바뀐 엔티티에 따라 다시 만들어야 함.
         await this.memberService.createMember(name, email);
     }
 
