@@ -11,7 +11,7 @@ export const ReportCount = pgTable('report_count', {
 });
 
 export const reportCountRelations = relations(ReportCount, ({ one }) => ({
-    Member: one(Member, {
+    member: one(Member, {
         fields: [ReportCount.memberId],
         references: [Member.id],
     }),
