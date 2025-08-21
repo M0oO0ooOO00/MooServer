@@ -21,7 +21,7 @@ export const Member = pgTable('member', {
 });
 
 export const memberRelations = relations(Member, ({ one }) => ({
-    Profile: one(Profile),
-    ReportCount: one(ReportCount),
-    Report: one(Report),
+    profile: one(Profile),
+    reportCount: one(ReportCount),
+    report: one(Report),
 }));
