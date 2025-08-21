@@ -3,3 +3,5 @@
 
 export * from '../../../member/domain/member.entity';
 export * from '../../../member/domain/profile.entity';
+export * from '../../../report/domain/report.entity';
+export * from '../../../report/domain/report-count.entity';

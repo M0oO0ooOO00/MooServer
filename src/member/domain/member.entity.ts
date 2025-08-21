@@ -3,6 +3,8 @@ import { relations } from 'drizzle-orm';
 import { baseColumns } from '../../common/db/base.entity';
 import { Role } from '../../common/enums/role.enum';
 import { Profile } from './profile.entity';
+import { ReportCount } from '../../report/domain/report-count.entity';
+import { Report } from '../../report/domain/report.entity';
 
 export const roleEnum = pgEnum(
     'role',
@@ -20,4 +22,6 @@ export const Member = pgTable('member', {
 
 export const memberRelations = relations(Member, ({ one }) => ({
     Profile: one(Profile),
+    ReportCount: one(ReportCount),
+    Report: one(Report),
 }));
