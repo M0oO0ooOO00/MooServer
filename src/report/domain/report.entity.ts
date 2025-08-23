@@ -1,14 +1,18 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
 import { relations } from 'drizzle-orm';
-import { Member } from '../../member/domain/member.entity';
+import { Member } from '../../member/domain';
 
 export const Report = pgTable('report', {
     ...baseColumns,
     reportType: text('report_type'),
     content: text('content'),
-    reporterId: integer('reporter_id').references(() => Member.id),
-    reportedId: integer('reported_id').references(() => Member.id),
+    reporterId: integer('reporter_id')
+        .notNull()
+        .references(() => Member.id),
+    reportedId: integer('reported_id')
+        .notNull()
+        .references(() => Member.id),
 });
 
 export const reportRelations = relations(Report, ({ one }) => ({
