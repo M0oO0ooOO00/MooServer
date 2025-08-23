@@ -1,17 +1,14 @@
-import { integer, pgEnum, pgTable } from 'drizzle-orm/pg-core';
+import { integer, pgTable } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
-import { Stadium } from '../../common/enums/stadium.enum';
 import { Post } from './post.entity';
 import { relations } from 'drizzle-orm';
+import { stadiumPgEnum } from '../../common/db/enums/stadium.pg-enum';
 
-export const stadiumEnum = pgEnum(
-    'stadium',
-    Object.values(Stadium) as [string, ...string[]],
-);
+export { stadiumPgEnum };
 
 export const TipsDetail = pgTable('tips_detail', {
     ...baseColumns,
-    stadium: stadiumEnum('stadium').notNull(),
+    stadium: stadiumPgEnum('stadium').notNull(),
     postId: integer('post_id')
         .notNull()
         .unique()
