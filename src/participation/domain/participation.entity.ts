@@ -25,7 +25,7 @@ export const participationRelations = relations(Participation, ({ one }) => ({
         references: [Member.id],
     }),
     recruitmentDetail: one(RecruitmentDetail, {
-        fields: [Participation.memberId],
+        fields: [Participation.recruitmentDetailId],
         references: [RecruitmentDetail.id],
     }),
 }));
