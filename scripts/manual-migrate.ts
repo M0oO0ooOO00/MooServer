@@ -23,7 +23,7 @@ async function manualMigrate(): Promise<void> {
                     await client.query(sql);
                     console.log('✅ Executed:', sql.split('\n')[0]);
                 } catch (error) {
-                    console.log('⚠️  Skipped (already exists):', sql.split('\n')[0]);
+                    console.log('⚠️  Skipped statement due to error:', sql.split('\n')[0], error.message);
                 }
             }
         }
