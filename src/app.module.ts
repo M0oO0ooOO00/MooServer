@@ -7,6 +7,8 @@ import { MemberModule } from './member/member.module';
 import { AuthModule } from './auth/auth.module';
 import { ReportModule } from './report/report.module';
 import { PostModule } from './post/post.module';
+import { ParticipationModule } from './participation/participation.module';
+import { ScrapModule } from './scrap/scrap.module';
 import databaseConfig from './common/config/database.config';
 import * as path from 'path';
 
@@ -22,6 +24,8 @@ import * as path from 'path';
         AuthModule,
         ReportModule,
         PostModule,
+        ParticipationModule,
+        ScrapModule,
     ],
     providers: [{ provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
 })
