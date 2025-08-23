@@ -6,7 +6,7 @@ import { relations } from 'drizzle-orm';
 export const PostImage = pgTable('post_image', {
     ...baseColumns,
     imageUrl: text('image_url').notNull(),
-    imageOrder: text('image_order'),
+    imageOrder: integer('image_order'),
     postId: integer('post_id')
         .notNull()
         .references(() => Post.id),
