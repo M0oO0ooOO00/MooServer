@@ -15,11 +15,12 @@ const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 export class HttpExceptionFilter implements ExceptionFilter {
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
+        const request = ctx.getRequest<Request>();
         const response = ctx.getResponse<Response>();
         if (exception instanceof DomainException) {
             const status = exception.getStatus();
             return response.status(status).json({
-                statusCode: status,
+                code: status,
                 data: exception.getResponse(),
             });
         } else if (exception instanceof HttpException) {
@@ -28,9 +29,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 status,
                 exception.message,
                 STATUS_CODES[status],
+                request.url,
             );
             return response.status(status).json({
-                statusCode: status,
+                code: status,
                 data: domainException.getResponse(),
             });
         } else {
@@ -38,6 +40,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 500,
                 (exception as Error)?.message ?? 'Unknown error occurred.',
                 UNKNOWN_ERROR,
+                request.url,
             );
             return response.status(500).json({
                 statusCode: 500,
