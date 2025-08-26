@@ -6,32 +6,43 @@ import {
     HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import { STATUS_CODES } from 'node:http';
+import { DomainException } from '../exceptions';
+
+const UNKNOWN_ERROR = 'UNKNOWN_ERROR';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
     catch(exception: unknown, host: ArgumentsHost) {
         const ctx = host.switchToHttp();
         const response = ctx.getResponse<Response>();
-        const request = ctx.getRequest<Request>();
-        const status =
-            exception instanceof HttpException
-                ? exception.getStatus()
-                : HttpStatus.INTERNAL_SERVER_ERROR;
-
-        const errorResponse = {
-            statusCode: status,
-            message:
-                exception instanceof HttpException
-                    ? exception.getResponse()['message'] || exception.message
-                    : '서버 오류가 발생했습니다.',
-            error:
-                exception instanceof HttpException
-                    ? exception.name
-                    : 'InternalServerError',
-            path: request.url,
-            timestamp: new Date().toISOString(),
-        };
-
-        response.status(status).json(errorResponse);
+        if (exception instanceof DomainException) {
+            const status = exception.getStatus();
+            return response.status(status).json({
+                statusCode: status,
+                data: exception.getResponse(),
+            });
+        } else if (exception instanceof HttpException) {
+            const status = exception.getStatus();
+            const domainException = new DomainException(
+                status,
+                exception.message,
+                STATUS_CODES[status],
+            );
+            return response.status(status).json({
+                statusCode: status,
+                data: domainException.getResponse(),
+            });
+        } else {
+            const domainException = new DomainException(
+                500,
+                (exception as Error)?.message ?? 'Unknown error occurred.',
+                UNKNOWN_ERROR,
+            );
+            return response.status(500).json({
+                statusCode: 500,
+                data: domainException.getResponse(),
+            });
+        }
     }
 }
