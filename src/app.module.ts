@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor } from './common/interceptors/log.interceptor';
+import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { LoggingInterceptor, ResponseInterceptor } from './common/interceptors';
+import { HttpExceptionFilter } from './common/filters';
 import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './common/db/db.module';
 import { MemberModule } from './member/member.module';
@@ -27,6 +28,10 @@ import * as path from 'path';
         ParticipationModule,
         ScrapModule,
     ],
-    providers: [{ provide: APP_INTERCEPTOR, useClass: LoggingInterceptor }],
+    providers: [
+        { provide: APP_FILTER, useClass: HttpExceptionFilter },
+        { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
+        { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
+    ],
 })
 export class AppModule {}
