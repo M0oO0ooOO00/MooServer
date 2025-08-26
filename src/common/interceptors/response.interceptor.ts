@@ -9,10 +9,10 @@ import { Request, Response } from 'express';
 import { CommonResponse } from '../response/common.response';
 
 @Injectable()
-export class ResponseInterceptor implements NestInterceptor {
+export class ResponseInterceptor<T> implements NestInterceptor<T, any> {
     intercept(
         context: ExecutionContext,
-        next: CallHandler<any>,
+        next: CallHandler<T>,
     ): Observable<any> | Promise<Observable<any>> {
         const transformResponse = (data: unknown) => {
             const req = context.switchToHttp().getRequest<Request>();
