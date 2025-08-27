@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
-import { LoggingInterceptor, ResponseInterceptor } from './common/interceptors';
+import { LoggingInterceptor } from './common/interceptors';
 import { HttpExceptionFilter } from './common/filters';
 import { ConfigModule } from '@nestjs/config';
 import { DbModule } from './common/db/db.module';
@@ -31,7 +31,6 @@ import * as path from 'path';
     providers: [
         { provide: APP_FILTER, useClass: HttpExceptionFilter },
         { provide: APP_INTERCEPTOR, useClass: LoggingInterceptor },
-        { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
     ],
 })
 export class AppModule {}
