@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { GetMemberResponse } from './get-member.response';
+import { Member } from '../../domain';
 
 interface GetMembersResponseInterface {
     members: GetMemberResponse[];
@@ -13,10 +14,7 @@ export class GetMembersResponse implements GetMembersResponseInterface {
         this.members = members;
     }
 
-    static from(members: GetMemberResponse[]): GetMembersResponse {
-        const memberSummary = members.map((member) =>
-            GetMemberResponse.from(member),
-        );
-        return new GetMembersResponse(memberSummary);
+    static from(members: (typeof Member.$inferSelect)[]): GetMembersResponse {
+        return new GetMembersResponse(members);
     }
 }
