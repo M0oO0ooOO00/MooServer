@@ -7,6 +7,7 @@ import {
     GetMemberSwagger,
     MemberControllerSwagger,
 } from '../swagger';
+import { GetMembersResponse } from '../dto/response/get-members.response';
 
 @Controller('member')
 @MemberControllerSwagger
@@ -24,7 +25,8 @@ export class MemberController {
     @Get('all')
     @GetMembersSwagger
     async getAllMembers() {
-        return await this.memberService.findAll();
+        const members = await this.memberService.findAll();
+        return GetMembersResponse.from(members);
     }
 
     @Get(':id')
