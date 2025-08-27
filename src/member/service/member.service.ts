@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MemberRepository } from '../repository/member.repository';
 
 @Injectable()
@@ -12,7 +12,11 @@ export class MemberService {
     }
 
     async findOneById(id: number) {
-        return await this.memberRepository.findOne(id);
+        const memberById = await this.memberRepository.findOne(id);
+        if (!memberById) {
+            throw new NotFoundException('존재하지 않는 회원입니다.');
+        }
+        return memberById;
     }
 
     async createMember(name: string, email: string) {
