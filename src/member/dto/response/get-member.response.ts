@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class GetMemberResponse {
+interface GetMemberResponseInterface {
+    id: number;
+    name: string;
+    createdAt: Date;
+}
+
+export class GetMemberResponse implements GetMemberResponseInterface {
     @ApiProperty({
         description: '사용자 ID',
         type: 'integer',
@@ -20,7 +26,7 @@ export class GetMemberResponse {
     })
     createdAt: Date;
 
-    static from(member: any): GetMemberResponse {
+    static from(member: GetMemberResponseInterface): GetMemberResponse {
         const dto = new GetMemberResponse();
         dto.id = member.id;
         dto.name = member.name;

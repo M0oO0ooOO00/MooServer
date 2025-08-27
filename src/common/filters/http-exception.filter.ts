@@ -3,7 +3,6 @@ import {
     Catch,
     ExceptionFilter,
     HttpException,
-    HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { STATUS_CODES } from 'node:http';
@@ -43,7 +42,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
                 request.url,
             );
             return response.status(500).json({
-                statusCode: 500,
+                code: 500,
                 data: domainException.getResponse(),
             });
         }

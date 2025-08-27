@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateMemberResponse {
+interface CreateMemberResponseInterface {
+    id: number;
+    name: string;
+    email: string;
+    createdAt: Date;
+}
+
+export class CreateMemberResponse implements CreateMemberResponseInterface {
     @ApiProperty({ description: '생성된 사용자 ID', type: 'integer' })
     id: number;
 
@@ -13,7 +20,7 @@ export class CreateMemberResponse {
     @ApiProperty({ description: '생성일', type: 'string', format: 'date-time' })
     createdAt: Date;
 
-    static from(member: any): CreateMemberResponse {
+    static from(member: CreateMemberResponseInterface): CreateMemberResponse {
         const response = new CreateMemberResponse();
         response.id = member.id;
         response.name = member.name;
