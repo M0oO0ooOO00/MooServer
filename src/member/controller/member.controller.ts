@@ -8,6 +8,7 @@ import {
     MemberControllerSwagger,
 } from '../swagger';
 import { GetMembersResponse } from '../dto/response/get-members.response';
+import { GetMemberResponse } from '../dto/response/get-member.response';
 
 @Controller('member')
 @MemberControllerSwagger
@@ -32,6 +33,7 @@ export class MemberController {
     @Get(':id')
     @GetMemberSwagger
     async getMemberById(@Param('id') id: number) {
-        return await this.memberService.findOneById(id);
+        const memberById = await this.memberService.findOneById(id);
+        return GetMemberResponse.from(memberById);
     }
 }

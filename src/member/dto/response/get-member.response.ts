@@ -17,6 +17,7 @@ export class GetMemberResponse implements GetMemberResponseInterface {
     @ApiProperty({
         description: '사용자 이름',
         type: 'string',
+        example: '김철수',
     })
     name: string;
 
