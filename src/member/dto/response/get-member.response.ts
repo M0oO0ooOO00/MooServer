@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Member } from '../../domain/member.entity';
 
 interface GetMemberResponseInterface {
     id: number;
@@ -26,7 +27,7 @@ export class GetMemberResponse implements GetMemberResponseInterface {
     })
     createdAt: Date;
 
-    static from(member: GetMemberResponseInterface): GetMemberResponse {
+    static from(member: typeof Member.$inferSelect): GetMemberResponse {
         const dto = new GetMemberResponse();
         dto.id = member.id;
         dto.name = member.name;
