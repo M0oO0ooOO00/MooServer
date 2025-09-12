@@ -12,16 +12,7 @@ async function bootstrap() {
 
     // swagger-config
     SwaggerConfig.setUp(app);
-
-    // await seeding().then(
-    //     () => {
-    //         console.log('Seeding completed');
-    //     },
-    //     (err) => {
-    //         console.error('Seeding failed:', err);
-    //     },
-    // );
-
     await app.listen(port ?? 3030);
 }
+
 bootstrap();
