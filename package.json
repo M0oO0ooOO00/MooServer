@@ -21,9 +21,11 @@
     "db:migrate": "drizzle-kit push --config ./src/common/config/drizzle.config.ts",
     "db:generate": "drizzle-kit generate --config ./src/common/config/drizzle.config.ts",
     "db:drop": "tsx scripts/drop-db.ts",
+    "db:clear": "tsx scripts/clear-db.ts",
     "db:reset": "npm run db:drop && npm run migrate",
     "db:migrate-manual": "npm run generate && tsx scripts/manual-migrate.ts",
-    "db:seed": "tsx seed.ts"
+    "db:seed": "tsx seed.ts",
+    "db:fresh": "npm run db:clear && npm run db:seed"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
