@@ -8,9 +8,9 @@ import { Post } from '../../post/domain';
 import { Participation } from '../../participation/domain';
 import { Scrap } from '../../scrap/domain';
 import { Warn } from '../../admin/domain';
-import { rolePgEnum } from '../../common/db/enums';
+import { rolePgEnum, genderPgEnum } from '../../common/db/enums';
 
-export { rolePgEnum };
+export { rolePgEnum, genderPgEnum };
 
 export const Member = pgTable('member', {
     ...baseColumns,
@@ -18,6 +18,7 @@ export const Member = pgTable('member', {
     email: text('email').notNull(),
     birthDate: text('birth_date').notNull(),
     phoneNumber: text('phone_number'),
+    gender: genderPgEnum('gender'),
     role: rolePgEnum('role').notNull(),
 });
 
