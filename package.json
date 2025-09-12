@@ -18,11 +18,12 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "migrate": "drizzle-kit push --config ./src/common/config/drizzle.config.ts",
-    "generate": "drizzle-kit generate --config ./src/common/config/drizzle.config.ts",
+    "db:migrate": "drizzle-kit push --config ./src/common/config/drizzle.config.ts",
+    "db:generate": "drizzle-kit generate --config ./src/common/config/drizzle.config.ts",
     "db:drop": "tsx scripts/drop-db.ts",
     "db:reset": "npm run db:drop && npm run migrate",
-    "db:migrate-manual": "npm run generate && tsx scripts/manual-migrate.ts"
+    "db:migrate-manual": "npm run generate && tsx scripts/manual-migrate.ts",
+    "db:seed": "tsx seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -34,6 +35,7 @@
     "@nestjs/swagger": "^11.2.0",
     "dotenv": "^17.2.1",
     "drizzle-orm": "^0.44.3",
+    "drizzle-seed": "^0.3.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-oauth2": "^1.8.0",
