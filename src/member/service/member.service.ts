@@ -114,4 +114,39 @@ export class MemberService {
     async createMember(name: string, email: string) {
         // await this.memberRepository.create(name, email);
     }
+
+    async findMemberDetailForAdmin(memberId: number) {
+        const memberExists = await this.memberRepository.findOneById(memberId);
+        if (!memberExists) {
+            throw new NotFoundException('존재하지 않는 회원입니다.');
+        }
+
+        const [
+            memberWithProfile,
+            warnRecords,
+            reportingRecords,
+            reportedRecords,
+            statistics,
+        ] = await Promise.all([
+            this.memberRepository.findMemberWithProfile(memberId),
+            this.memberRepository.findWarnRecordsByMemberId(memberId),
+            this.memberRepository.findReportingRecordsByMemberId(memberId),
+            this.memberRepository.findReportedRecordsByMemberId(memberId),
+            this.memberRepository.getMemberStatistics(memberId),
+        ]);
+
+        const result = memberWithProfile[0];
+        if (!result) {
+            throw new NotFoundException('회원 정보를 찾을 수 없습니다.');
+        }
+
+        return {
+            member: result.member,
+            profile: result.profile,
+            warnRecords,
+            reportingRecords,
+            reportedRecords,
+            statistics,
+        };
+    }
 }
