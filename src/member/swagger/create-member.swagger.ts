@@ -31,11 +31,12 @@ export const CreateMemberSwagger = applyDecorators(
             code: 400,
             data: {
                 errorCode: 'BAD_REQUEST',
-                message: '유효성 검사 실패: 이름은 필수입니다, 이메일 형식이 올바르지 않습니다.',
+                message:
+                    '유효성 검사 실패: 이름은 필수입니다, 이메일 형식이 올바르지 않습니다.',
                 path: '/member',
-                timestamp: '2025-01-01T00:00:00.000Z'
-            }
-        }
+                timestamp: '2025-01-01T00:00:00.000Z',
+            },
+        },
     }),
     ApiConflictResponse({
         type: ErrorResponseDto,
@@ -46,9 +47,9 @@ export const CreateMemberSwagger = applyDecorators(
                 errorCode: 'CONFLICT',
                 message: '이미 존재하는 이메일입니다.',
                 path: '/member',
-                timestamp: '2025-01-01T00:00:00.000Z'
-            }
-        }
+                timestamp: '2025-01-01T00:00:00.000Z',
+            },
+        },
     }),
     ApiInternalServerErrorResponse({
         type: ErrorResponseDto,
@@ -59,8 +60,8 @@ export const CreateMemberSwagger = applyDecorators(
                 errorCode: 'UNKNOWN_ERROR',
                 message: '알 수 없는 오류가 발생했습니다.',
                 path: '/member',
-                timestamp: '2025-01-01T00:00:00.000Z'
-            }
-        }
+                timestamp: '2025-01-01T00:00:00.000Z',
+            },
+        },
     }),
 );
