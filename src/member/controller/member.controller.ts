@@ -1,8 +1,17 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { MemberService } from '../service/member.service';
+import {
+    Body,
+    Controller,
+    Get,
+    Param,
+    ParseIntPipe,
+    Post,
+    Query,
+} from '@nestjs/common';
+import { MemberService } from '../service';
 import { CreateMemberRequest } from '../dto/request/create-member.request';
 import {
     CreateMemberSwagger,
+    GetMembersByPageSwagger,
     GetMembersSwagger,
     GetMemberSwagger,
     MemberControllerSwagger,
@@ -28,6 +37,12 @@ export class MemberController {
     async getAllMembers() {
         const members = await this.memberService.findAll();
         return GetMembersResponse.from(members);
+    }
+
+    @Get()
+    @GetMembersByPageSwagger
+    async getMembersByPage(@Query('page', ParseIntPipe) page: number = 1) {
+        return await this.memberService.findAllByPage(page);
     }
 
     @Get(':id')
