@@ -7,6 +7,7 @@ import { Report } from '../../report/domain';
 import { Post } from '../../post/domain';
 import { Participation } from '../../participation/domain';
 import { Scrap } from '../../scrap/domain';
+import { Warn } from '../../admin/domain';
 import { rolePgEnum } from '../../common/db/enums';
 
 export { rolePgEnum };
@@ -28,4 +29,5 @@ export const memberRelations = relations(Member, ({ one, many }) => ({
     reported: many(Report, { relationName: 'reported' }),
     participation: many(Participation),
     scrap: many(Scrap),
+    warn: many(Warn),
 }));
