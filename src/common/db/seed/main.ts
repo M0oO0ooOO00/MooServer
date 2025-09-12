@@ -1,10 +1,12 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
-import { Member } from '../../../member/domain';
+import { Member, Profile } from '../../../member/domain';
 import { Report } from '../../../report/domain';
 import { ReportCount } from '../../../report/domain';
 import { Warn } from '../../../admin/domain';
 import { Role } from '../../enums/role.enum';
+import { Gender } from '../../enums/gender.enum';
+import { Team } from '../../enums/team.enum';
 import type { InferInsertModel } from 'drizzle-orm';
 
 const REPORT_TYPES = [
@@ -37,22 +39,28 @@ export async function seeding() {
     const pool = new Pool({
         connectionString: process.env.DATABASE_URL,
     });
-    
+
     const db = drizzle(pool, {
-        logger: true
+        logger: true,
     });
 
     console.log('🌱 Seeding database...');
 
-    // 1. Create 50 Members with different roles
+    // 1. 다양한 권한을 가진 50명의 회원 생성
     const memberData: InferInsertModel<typeof Member>[] = [];
     for (let i = 1; i <= 50; i++) {
-        const role = i <= 5 ? Role.ADMIN : Role.USER; // First 5 are admins
+        const role = i <= 5 ? Role.ADMIN : Role.USER; // 첫 5명은 관리자
+        const gender = getRandomElement([
+            Gender.MALE,
+            Gender.FEMALE,
+            Gender.OTHER,
+        ]);
         memberData.push({
             name: `User${i}`,
             email: `user${i}@example.com`,
-            birthDate: `199${Math.floor(Math.random() * 10)}-0${Math.floor(Math.random() * 9) + 1}-${10 + Math.floor(Math.random() * 20)}`,
+            birthDate: `199${Math.floor(Math.random() * 10)}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
             phoneNumber: `010-${1000 + Math.floor(Math.random() * 9000)}-${1000 + Math.floor(Math.random() * 9000)}`,
+            gender,
             role,
             createdAt: getRandomDate(new Date('2024-01-01'), new Date()),
             updatedAt: getRandomDate(new Date('2024-01-01'), new Date()),
@@ -65,7 +73,30 @@ export async function seeding() {
         .returning();
     console.log(`✅ Created ${insertedMembers.length} members`);
 
-    // 2. Create ReportCount for each member
+    // 2. 각 회원에 대한 프로필 생성
+    const profileData: InferInsertModel<typeof Profile>[] = insertedMembers.map(
+        (member, index) => {
+            const supportTeam =
+                Math.random() > 0.2
+                    ? getRandomElement(Object.values(Team))
+                    : null; // 80% 확률로 응원팀 설정
+            return {
+                nickname: `${member.name}_nickname`,
+                supportTeam,
+                memberId: member.id,
+                createdAt: getRandomDate(new Date('2024-01-01'), new Date()),
+                updatedAt: getRandomDate(new Date('2024-01-01'), new Date()),
+            };
+        },
+    );
+
+    const insertedProfiles = await db
+        .insert(Profile)
+        .values(profileData)
+        .returning();
+    console.log(`✅ Created ${insertedProfiles.length} profiles`);
+
+    // 3. 각 회원에 대한 신고 횟수 생성
     const reportCountData = insertedMembers.map((member) => ({
         memberId: member.id,
         reportingCount: Math.floor(Math.random() * 10),
@@ -80,14 +111,14 @@ export async function seeding() {
         .returning();
     console.log(`✅ Created ${insertedReportCounts.length} report counts`);
 
-    // 3. Create Reports (relationships between members)
+    // 4. 신고 생성 (회원 간의 관계)
     const reportData: InferInsertModel<typeof Report>[] = [];
     for (let i = 0; i < 80; i++) {
-        // Create 80 reports
+        // 80개의 신고 생성
         const reporter = getRandomElement(insertedMembers);
         let reported = getRandomElement(insertedMembers);
 
-        // Make sure reporter and reported are different
+        // 신고자와 피신고자가 다른지 확인
         while (reported.id === reporter.id) {
             reported = getRandomElement(insertedMembers);
         }
@@ -108,12 +139,12 @@ export async function seeding() {
         .returning();
     console.log(`✅ Created ${insertedReports.length} reports`);
 
-    // 4. Create Warns (only for some members)
+    // 5. 경고 생성 (일부 회원에게만)
     const warnData: InferInsertModel<typeof Warn>[] = [];
-    const membersToWarn = insertedMembers.filter(() => Math.random() < 0.4); // 40% of members get warns
+    const membersToWarn = insertedMembers.filter(() => Math.random() < 0.4); // 40% 회원이 경고 받음
 
     for (const member of membersToWarn) {
-        const numberOfWarns = Math.floor(Math.random() * 3) + 1; // 1-3 warns per member
+        const numberOfWarns = Math.floor(Math.random() * 3) + 1; // 회원당 1-3개 경고
         for (let i = 0; i < numberOfWarns; i++) {
             warnData.push({
                 reason: getRandomElement(WARN_REASONS),
@@ -130,12 +161,13 @@ export async function seeding() {
     console.log('🎉 Seeding completed successfully!');
     console.log(`📊 Summary:`);
     console.log(
-        `   - Members: ${insertedMembers.length} (${insertedMembers.filter((m) => m.role === Role.ADMIN).length} admins, ${insertedMembers.filter((m) => m.role === Role.USER).length} users)`,
+        `   - Members: ${insertedMembers.length} (${insertedMembers.filter((m) => m.role === 'ADMIN').length} admins, ${insertedMembers.filter((m) => m.role === 'USER').length} users)`,
     );
+    console.log(`   - Profiles: ${insertedProfiles.length}`);
     console.log(`   - Report Counts: ${insertedReportCounts.length}`);
     console.log(`   - Reports: ${insertedReports.length}`);
     console.log(`   - Warns: ${insertedWarns.length}`);
-    
-    // Close the database connection
+
+    // 데이터베이스 연결 종료
     await pool.end();
 }
