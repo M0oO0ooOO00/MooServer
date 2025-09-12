@@ -10,6 +10,7 @@ import { ReportModule } from './report/report.module';
 import { PostModule } from './post/post.module';
 import { ParticipationModule } from './participation/participation.module';
 import { ScrapModule } from './scrap/scrap.module';
+import { AdminModule } from './admin/admin.module';
 import databaseConfig from './common/config/database.config';
 import * as path from 'path';
 
@@ -27,6 +28,7 @@ import * as path from 'path';
         PostModule,
         ParticipationModule,
         ScrapModule,
+        AdminModule,
     ],
     providers: [
         { provide: APP_FILTER, useClass: HttpExceptionFilter },
