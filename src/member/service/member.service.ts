@@ -1,22 +1,114 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { MemberRepository } from '../repository/member.repository';
+import {
+    BadRequestException,
+    Inject,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common';
+import { MemberRepository } from '../repository';
+import { PagePaginationResponse } from '../../common/response/page-pagination.response';
+import { ReportRepository } from '../../report/repository';
+import { GetMemberListResponse } from '../dto/response/get-member-list.response';
 
 @Injectable()
 export class MemberService {
+    private static readonly DEFAULT_PAGE_SIZE = 10;
+    private static readonly DEFAULT_NICKNAME = '닉네임 없음';
+
     constructor(
         @Inject() private readonly memberRepository: MemberRepository,
+        @Inject() private readonly reportRepository: ReportRepository,
     ) {}
 
     async findAll() {
         return await this.memberRepository.findAll();
     }
 
+    async findAllByPage(
+        page: number,
+        pageSize: number = MemberService.DEFAULT_PAGE_SIZE,
+    ) {
+        this.validatePageNumber(page);
+        this.validatePageSize(pageSize);
+
+        const [membersWithDetails, totalMembersResult] = await Promise.all([
+            this.memberRepository.findAllByPageWithDetails(page, pageSize),
+            this.memberRepository.count(),
+        ]);
+
+        const totalMembers = this.extractTotalCount(totalMembersResult);
+        const memberListResponses = this.mapToResponseDto(membersWithDetails);
+
+        return this.createPaginationResponse(
+            memberListResponses,
+            page,
+            pageSize,
+            totalMembers,
+        );
+    }
+
+    private validatePageNumber(page: number): void {
+        if (page < 1) {
+            throw new BadRequestException('페이지는 1보다 커야합니다.');
+        }
+    }
+
+    private validatePageSize(pageSize: number): void {
+        if (pageSize < 1 || pageSize > 100) {
+            throw new BadRequestException(
+                '페이지 크기는 1~100 사이여야 합니다.',
+            );
+        }
+    }
+
+    private extractTotalCount(totalMembersResult: { count: number }[]): number {
+        return totalMembersResult[0]?.count || 0;
+    }
+
+    private mapToResponseDto(
+        members: Awaited<
+            ReturnType<typeof this.memberRepository.findAllByPageWithDetails>
+        >,
+    ): GetMemberListResponse[] {
+        return members.map((member) => this.createMemberListResponse(member));
+    }
+
+    private createMemberListResponse(
+        member: Awaited<
+            ReturnType<typeof this.memberRepository.findAllByPageWithDetails>
+        >[0],
+    ): GetMemberListResponse {
+        return new GetMemberListResponse(
+            member.id,
+            member.nickname || MemberService.DEFAULT_NICKNAME,
+            member.warningCount,
+            member.reportingCount,
+            member.reportedCount,
+            member.joinedAt,
+        );
+    }
+
+    private createPaginationResponse(
+        memberListResponses: GetMemberListResponse[],
+        currentPage: number,
+        pageSize: number,
+        totalMembers: number,
+    ): PagePaginationResponse<GetMemberListResponse[]> {
+        return PagePaginationResponse.from(
+            memberListResponses,
+            currentPage,
+            pageSize,
+            totalMembers,
+        );
+    }
+
     async findOneById(id: number) {
-        const memberById = await this.memberRepository.findOne(id);
+        const memberById = await this.memberRepository.findOneById(id);
+        const reportsByMemberId =
+            await this.reportRepository.findByMemberId(id);
         if (!memberById) {
             throw new NotFoundException('존재하지 않는 회원입니다.');
         }
-        return memberById;
+        return { ...memberById, reports: reportsByMemberId };
     }
 
     async createMember(name: string, email: string) {
