@@ -1,4 +1,11 @@
-import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
+import {
+    Controller,
+    DefaultValuePipe,
+    Get,
+    Param,
+    ParseIntPipe,
+    Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminService } from '../service';
 import { MemberService } from '../../member/service';
@@ -20,12 +27,11 @@ export class AdminController {
     @Get('/members')
     @GetMembersByPageSwagger
     async getAllMembersByPage(
-        @Query('page') page: string = '1',
-        @Query('pageSize') pageSize: string = '10',
+        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
+        @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
+        pageSize: number,
     ) {
-        const pageNum = parseInt(page, 10);
-        const pageSizeNum = parseInt(pageSize, 10);
-        return await this.memberService.findAllByPage(pageNum, pageSizeNum);
+        return await this.memberService.findAllByPage(page, pageSize);
     }
 
     @Get('/members/:id')
