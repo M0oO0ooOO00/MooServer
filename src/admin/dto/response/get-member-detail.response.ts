@@ -33,7 +33,7 @@ interface WarnRecord {
 }
 
 interface ReportRecord {
-    reportType: string;
+    reportType: string | null;
     postType: string | null;
     postTitle: string | null;
     postId: number | null;
@@ -108,8 +108,9 @@ export class ReportRecordResponse implements ReportRecord {
         description: '신고 사유',
         type: 'string',
         example: '스팸/도배',
+        nullable: true,
     })
-    reportType: string;
+    reportType: string | null;
 
     @ApiProperty({
         description: '신고글 유형',
@@ -160,7 +161,7 @@ export class ReportRecordResponse implements ReportRecord {
     reportedAt: Date;
 
     constructor(
-        reportType: string,
+        reportType: string | null,
         postType: string | null,
         postTitle: string | null,
         postId: number | null,
@@ -359,7 +360,7 @@ export class MemberDetailResponse
         dto.recentReporting = reportingRecords.slice(0, 3).map(
             (record) =>
                 new ReportRecordResponse(
-                    record.report.reportType || '기타',
+                    record.report.reportType,
                     record.post
                         ? PostTypeDescription[record.post.postType]
                         : null,
@@ -375,7 +376,7 @@ export class MemberDetailResponse
         dto.recentReported = reportedRecords.slice(0, 3).map(
             (record) =>
                 new ReportRecordResponse(
-                    record.report.reportType || '기타',
+                    record.report.reportType,
                     record.post
                         ? PostTypeDescription[record.post.postType]
                         : null,
