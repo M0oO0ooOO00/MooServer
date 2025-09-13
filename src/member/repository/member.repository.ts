@@ -40,14 +40,22 @@ export class MemberRepository {
             .select({
                 id: Member.id,
                 nickname: Profile.nickname,
-                warningCount: sql<number>`COALESCE((SELECT COUNT(*) FROM ${Warn} WHERE ${Warn.memberId} = ${Member.id}), 0)::integer`,
+                warningCount: sql<number>`COALESCE(COUNT(${Warn.id}), 0)::integer`,
                 reportingCount: sql<number>`COALESCE(${ReportCount.reportingCount}, 0)`,
                 reportedCount: sql<number>`COALESCE(${ReportCount.reportedCount}, 0)`,
                 joinedAt: Member.createdAt,
             })
             .from(Member)
             .leftJoin(Profile, eq(Member.id, Profile.memberId))
+            .leftJoin(Warn, eq(Member.id, Warn.memberId))
             .leftJoin(ReportCount, eq(Member.id, ReportCount.memberId))
+            .groupBy(
+                Member.id,
+                Profile.nickname,
+                ReportCount.reportingCount,
+                ReportCount.reportedCount,
+                Member.createdAt,
+            )
             .limit(pageSize)
             .offset((page - 1) * pageSize);
     }
