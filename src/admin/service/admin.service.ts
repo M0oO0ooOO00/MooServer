@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { MemberService } from '../../member/service';
 import { MemberDetailResponse } from '../dto';
 import { PostType } from '../../post/enums/post-type.enum';
@@ -60,7 +60,9 @@ export class AdminService {
             case 'TIPS':
                 return PostType.TIPS;
             default:
-                return PostType.RECRUITMENT;
+                throw new BadRequestException(
+                    '게시글 타입이 올바르지 않습니다.',
+                );
         }
     }
 }
