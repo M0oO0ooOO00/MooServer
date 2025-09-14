@@ -2,10 +2,13 @@ import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
 import { relations } from 'drizzle-orm';
 import { Member } from '../../member/domain';
+import { reportTypePgEnum } from '../../common/db/enums';
+
+export { reportTypePgEnum };
 
 export const Report = pgTable('report', {
     ...baseColumns,
-    reportType: text('report_type'),
+    reportType: reportTypePgEnum('report_type'),
     content: text('content'),
     reporterId: integer('reporter_id')
         .notNull()

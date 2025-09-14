@@ -1,4 +1,4 @@
-import { integer, pgTable, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, timestamp, unique } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
 import { recruitmentPgEnum } from '../../common/db/enums';
 import { Member } from '../../member/domain';
@@ -7,17 +7,26 @@ import { relations } from 'drizzle-orm';
 
 export { recruitmentPgEnum };
 
-export const Participation = pgTable('participation', {
-    ...baseColumns,
-    role: recruitmentPgEnum('role').notNull(),
-    joinedAt: timestamp('joined_at').notNull(),
-    memberId: integer('member_id')
-        .notNull()
-        .references(() => Member.id),
-    recruitmentDetailId: integer('recruitment_detail_id')
-        .notNull()
-        .references(() => RecruitmentDetail.id),
-});
+export const Participation = pgTable(
+    'participation',
+    {
+        ...baseColumns,
+        role: recruitmentPgEnum('role').notNull(),
+        joinedAt: timestamp('joined_at').notNull(),
+        memberId: integer('member_id')
+            .notNull()
+            .references(() => Member.id),
+        recruitmentDetailId: integer('recruitment_detail_id')
+            .notNull()
+            .references(() => RecruitmentDetail.id),
+    },
+    (table) => ({
+        uniqueMemberRecruitment: unique().on(
+            table.memberId,
+            table.recruitmentDetailId,
+        ),
+    }),
+);
 
 export const participationRelations = relations(Participation, ({ one }) => ({
     member: one(Member, {

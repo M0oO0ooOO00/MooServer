@@ -6,6 +6,7 @@ import { TipsDetail } from './tips-detail.entity';
 import { RecruitmentDetail } from './recruitment-detail.entity';
 import { PostImage } from './post-image.entity';
 import { Scrap } from '../../scrap/domain';
+import { Comment } from '../../comment/domain';
 import { postTypePgEnum, statusPgEnum } from '../../common/db/enums';
 
 export { statusPgEnum, postTypePgEnum };
@@ -29,4 +30,5 @@ export const postRelations = relations(Post, ({ one, many }) => ({
     tipsDetail: one(TipsDetail),
     postImage: many(PostImage),
     scrap: many(Scrap),
+    comment: many(Comment),
 }));

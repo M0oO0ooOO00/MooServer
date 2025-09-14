@@ -1,4 +1,4 @@
-import { integer, pgTable } from 'drizzle-orm/pg-core';
+import { integer, pgTable, unique } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
 import { Member } from '../../member/domain';
 import { Post } from '../../post/domain';
@@ -12,7 +12,9 @@ export const Scrap = pgTable('scrap', {
     postId: integer('post_id')
         .notNull()
         .references(() => Post.id),
-});
+}, (table) => ({
+    uniqueMemberPost: unique().on(table.memberId, table.postId),
+}));
 
 export const scrapRelations = relations(Scrap, ({ one }) => ({
     member: one(Member, {

@@ -7,6 +7,7 @@ import { Report } from '../../report/domain';
 import { Post } from '../../post/domain';
 import { Participation } from '../../participation/domain';
 import { Scrap } from '../../scrap/domain';
+import { Comment } from '../../comment/domain';
 import { Warn } from '../../admin/domain';
 import { rolePgEnum, genderPgEnum } from '../../common/db/enums';
 
@@ -25,7 +26,8 @@ export const Member = pgTable('member', {
 export const memberRelations = relations(Member, ({ one, many }) => ({
     profile: one(Profile),
     post: many(Post),
-    reportCount: many(ReportCount),
+    comment: many(Comment),
+    reportCount: one(ReportCount),
     reporter: many(Report, { relationName: 'reporter' }),
     reported: many(Report, { relationName: 'reported' }),
     participation: many(Participation),
