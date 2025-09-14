@@ -9,6 +9,7 @@ import { Warn } from '../../admin/domain';
 import { Post, RecruitmentDetail } from '../../post/domain';
 import { Scrap } from '../../scrap/domain';
 import { Participation } from '../../participation/domain';
+import { RecruitmentQueryResult } from '../type';
 
 type MemberType = typeof Member.$inferSelect;
 
@@ -148,93 +149,51 @@ export class MemberRepository {
         memberId: number,
         page: number,
         pageSize: number,
-    ) {
-        return this.db
-            .select({
-                title: Post.title,
-                gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
-                gameDateTime: RecruitmentDetail.gameDate,
-                teamHome: RecruitmentDetail.teamHome,
-                teamAway: RecruitmentDetail.teamAway,
-                authorNickname: sql<string>`COALESCE(${Profile.nickname}, '닉네임 없음')`,
-                postStatus: Post.status,
-                createdAt: Post.createdAt,
-            })
+    ): Promise<RecruitmentQueryResult[]> {
+        const baseQuery = this.createRecruitmentSelectQuery()
             .from(Scrap)
             .innerJoin(Post, eq(Scrap.postId, Post.id))
-            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
-            .innerJoin(Member, eq(Post.authorId, Member.id))
-            .leftJoin(Profile, eq(Member.id, Profile.memberId))
             .where(
                 and(
                     eq(Scrap.memberId, memberId),
                     eq(Post.post_type, 'RECRUITMENT'),
                 ),
-            )
-            .orderBy(desc(Post.createdAt))
-            .limit(pageSize)
-            .offset((page - 1) * pageSize);
+            );
+
+        return this.executeRecruitmentQuery(baseQuery, page, pageSize);
     }
 
     async findWrittenRecruitmentsByMemberId(
         memberId: number,
         page: number,
         pageSize: number,
-    ) {
-        return this.db
-            .select({
-                title: Post.title,
-                gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
-                gameDateTime: RecruitmentDetail.gameDate,
-                teamHome: RecruitmentDetail.teamHome,
-                teamAway: RecruitmentDetail.teamAway,
-                authorNickname: sql<string>`COALESCE(${Profile.nickname}, '닉네임 없음')`,
-                postStatus: Post.status,
-                createdAt: Post.createdAt,
-            })
+    ): Promise<RecruitmentQueryResult[]> {
+        const baseQuery = this.createRecruitmentSelectQuery()
             .from(Post)
-            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
-            .innerJoin(Member, eq(Post.authorId, Member.id))
-            .leftJoin(Profile, eq(Member.id, Profile.memberId))
             .where(
                 and(
                     eq(Post.authorId, memberId),
                     eq(Post.post_type, 'RECRUITMENT'),
                 ),
-            )
-            .orderBy(desc(Post.createdAt))
-            .limit(pageSize)
-            .offset((page - 1) * pageSize);
+            );
+
+        return this.executeRecruitmentQuery(baseQuery, page, pageSize);
     }
 
     async findParticipatedRecruitmentsByMemberId(
         memberId: number,
         page: number,
         pageSize: number,
-    ) {
-        return this.db
-            .select({
-                title: Post.title,
-                gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
-                gameDateTime: RecruitmentDetail.gameDate,
-                teamHome: RecruitmentDetail.teamHome,
-                teamAway: RecruitmentDetail.teamAway,
-                authorNickname: sql<string>`COALESCE(${Profile.nickname}, '닉네임 없음')`,
-                postStatus: Post.status,
-                createdAt: Post.createdAt,
-            })
+    ): Promise<RecruitmentQueryResult[]> {
+        const baseQuery = this.createRecruitmentSelectQuery()
             .from(Participation)
             .innerJoin(
                 RecruitmentDetail,
                 eq(Participation.recruitmentDetailId, RecruitmentDetail.id),
             )
-            .innerJoin(Post, eq(RecruitmentDetail.postId, Post.id))
-            .innerJoin(Member, eq(Post.authorId, Member.id))
-            .leftJoin(Profile, eq(Member.id, Profile.memberId))
-            .where(eq(Participation.memberId, memberId))
-            .orderBy(desc(Post.createdAt))
-            .limit(pageSize)
-            .offset((page - 1) * pageSize);
+            .where(eq(Participation.memberId, memberId));
+
+        return this.executeRecruitmentQuery(baseQuery, page, pageSize);
     }
 
     async countScrappedRecruitmentsByMemberId(
@@ -284,5 +243,32 @@ export class MemberRepository {
             .where(eq(Participation.memberId, memberId));
 
         return result[0]?.count || 0;
+    }
+
+    private createRecruitmentSelectQuery() {
+        return this.db.select({
+            title: Post.title,
+            gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
+            gameDateTime: RecruitmentDetail.gameDate,
+            teamHome: RecruitmentDetail.teamHome,
+            teamAway: RecruitmentDetail.teamAway,
+            authorNickname: Profile.nickname,
+            postStatus: Post.status,
+            createdAt: Post.createdAt,
+        });
+    }
+
+    private executeRecruitmentQuery(
+        baseQuery: any,
+        page: number,
+        pageSize: number,
+    ): Promise<RecruitmentQueryResult[]> {
+        return baseQuery
+            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
+            .innerJoin(Member, eq(Post.authorId, Member.id))
+            .leftJoin(Profile, eq(Member.id, Profile.memberId))
+            .orderBy(desc(Post.createdAt))
+            .limit(pageSize)
+            .offset((page - 1) * pageSize);
     }
 }
