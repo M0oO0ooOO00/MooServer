@@ -10,6 +10,8 @@ import { ReportRepository } from '../../report/repository';
 import { GetMemberListResponse } from '../dto/response/get-member-list.response';
 import { RecruitmentSummaryResponse } from '../dto/response/recruitment-summary.response';
 import { PaginationService } from '../../common/service';
+import { RecruitmentQueryResult } from '../type';
+
 
 @Injectable()
 export class MemberService {
@@ -156,90 +158,93 @@ export class MemberService {
     async getMyScrappedRecruitments(
         memberId: number,
         page: number,
-        pageSize: number = this.paginationService.getDefaultRecruitmentPageSize(),
+        pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
-        const [recruitments, totalCount] = await Promise.all([
-            this.memberRepository.findScrappedRecruitmentsByMemberId(
-                memberId,
-                page,
-                pageSize,
-            ),
-            this.memberRepository.countScrappedRecruitmentsByMemberId(memberId),
-        ]);
-
-        console.log(recruitments);
-
-        const responses = recruitments.map((recruitment, index) =>
-            RecruitmentSummaryResponse.create(
-                index,
-                page,
-                pageSize,
-                recruitment,
-            ),
-        );
-
-        return this.paginationService.createResponse(
-            responses,
+        return this.getMyRecruitments(
+            (memberId, page, pageSize) =>
+                this.memberRepository.findScrappedRecruitmentsByMemberId(
+                    memberId,
+                    page,
+                    pageSize,
+                ),
+            (memberId) =>
+                this.memberRepository.countScrappedRecruitmentsByMemberId(
+                    memberId,
+                ),
+            memberId,
             page,
             pageSize,
-            totalCount,
         );
     }
 
     async getMyWrittenRecruitments(
         memberId: number,
         page: number,
-        pageSize: number = this.paginationService.getDefaultRecruitmentPageSize(),
+        pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
-        const [recruitments, totalCount] = await Promise.all([
-            this.memberRepository.findWrittenRecruitmentsByMemberId(
-                memberId,
-                page,
-                pageSize,
-            ),
-            this.memberRepository.countWrittenRecruitmentsByMemberId(memberId),
-        ]);
-
-        const responses = recruitments.map((recruitment, index) =>
-            RecruitmentSummaryResponse.create(
-                index,
-                page,
-                pageSize,
-                recruitment,
-            ),
-        );
-
-        return this.paginationService.createResponse(
-            responses,
+        return this.getMyRecruitments(
+            (memberId, page, pageSize) =>
+                this.memberRepository.findWrittenRecruitmentsByMemberId(
+                    memberId,
+                    page,
+                    pageSize,
+                ),
+            (memberId) =>
+                this.memberRepository.countWrittenRecruitmentsByMemberId(
+                    memberId,
+                ),
+            memberId,
             page,
             pageSize,
-            totalCount,
         );
     }
 
     async getMyParticipatedRecruitments(
         memberId: number,
         page: number,
-        pageSize: number = this.paginationService.getDefaultRecruitmentPageSize(),
+        pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
+    ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
+        return this.getMyRecruitments(
+            (memberId, page, pageSize) =>
+                this.memberRepository.findParticipatedRecruitmentsByMemberId(
+                    memberId,
+                    page,
+                    pageSize,
+                ),
+            (memberId) =>
+                this.memberRepository.countParticipatedRecruitmentsByMemberId(
+                    memberId,
+                ),
+            memberId,
+            page,
+            pageSize,
+        );
+    }
+
+    private async getMyRecruitments(
+        findFunction: (
+            memberId: number,
+            page: number,
+            pageSize: number,
+        ) => Promise<RecruitmentQueryResult[]>,
+        countFunction: (memberId: number) => Promise<number>,
+        memberId: number,
+        page: number,
+        pageSize: number,
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
         const [recruitments, totalCount] = await Promise.all([
-            this.memberRepository.findParticipatedRecruitmentsByMemberId(
-                memberId,
-                page,
-                pageSize,
-            ),
-            this.memberRepository.countParticipatedRecruitmentsByMemberId(
-                memberId,
-            ),
+            findFunction(memberId, page, pageSize),
+            countFunction(memberId),
         ]);
 
         const responses = recruitments.map((recruitment, index) =>
-            RecruitmentSummaryResponse.create(
-                index,
-                page,
-                pageSize,
-                recruitment,
-            ),
+            RecruitmentSummaryResponse.create(index, page, pageSize, {
+                ...recruitment,
+                authorNickname:
+                    recruitment.authorNickname ||
+                    MemberService.DEFAULT_NICKNAME,
+                gameDateTime: recruitment.gameDateTime.toISOString(),
+            }),
         );
 
         return this.paginationService.createResponse(

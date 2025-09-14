@@ -33,11 +33,11 @@ export class PaginationService {
         return PagePaginationResponse.from(data, page, pageSize, totalCount);
     }
 
-    getDefaultPageSize(): number {
+    public static getDefaultPageSize(): number {
         return PaginationService.DEFAULT_PAGE_SIZE;
     }
 
-    getDefaultRecruitmentPageSize(): number {
+    public static getDefaultRecruitmentPageSize(): number {
         return PaginationService.DEFAULT_RECRUITMENT_PAGE_SIZE;
     }
 }

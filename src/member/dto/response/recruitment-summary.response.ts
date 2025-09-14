@@ -100,8 +100,7 @@ export class RecruitmentSummaryResponse {
         postStatus: string,
         gameDateTime: string,
     ): 'RECRUITING' | 'COMPLETED' {
-        // 게시글이 비활성화된 경우 (작성자가 완료 처리)
-        if (postStatus === 'INACTIVE') {
+        if (postStatus === 'CLOSE') {
             return 'COMPLETED';
         }
 
