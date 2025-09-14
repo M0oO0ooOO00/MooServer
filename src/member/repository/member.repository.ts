@@ -144,7 +144,6 @@ export class MemberRepository {
         };
     }
 
-    // 마이페이지 - 스크랩한 모집글 조회
     async findScrappedRecruitmentsByMemberId(
         memberId: number,
         page: number,
@@ -177,7 +176,6 @@ export class MemberRepository {
             .offset((page - 1) * pageSize);
     }
 
-    // 마이페이지 - 작성한 모집글 조회
     async findWrittenRecruitmentsByMemberId(
         memberId: number,
         page: number,
@@ -199,14 +197,16 @@ export class MemberRepository {
             .innerJoin(Member, eq(Post.authorId, Member.id))
             .leftJoin(Profile, eq(Member.id, Profile.memberId))
             .where(
-                and(eq(Post.authorId, memberId), eq(Post.post_type, 'RECRUITMENT')),
+                and(
+                    eq(Post.authorId, memberId),
+                    eq(Post.post_type, 'RECRUITMENT'),
+                ),
             )
             .orderBy(desc(Post.createdAt))
             .limit(pageSize)
             .offset((page - 1) * pageSize);
     }
 
-    // 마이페이지 - 참여한 모집글 조회
     async findParticipatedRecruitmentsByMemberId(
         memberId: number,
         page: number,
@@ -237,8 +237,9 @@ export class MemberRepository {
             .offset((page - 1) * pageSize);
     }
 
-    // 카운트 쿼리들
-    async countScrappedRecruitmentsByMemberId(memberId: number): Promise<number> {
+    async countScrappedRecruitmentsByMemberId(
+        memberId: number,
+    ): Promise<number> {
         const result = await this.db
             .select({ count: count() })
             .from(Scrap)
@@ -253,12 +254,17 @@ export class MemberRepository {
         return result[0]?.count || 0;
     }
 
-    async countWrittenRecruitmentsByMemberId(memberId: number): Promise<number> {
+    async countWrittenRecruitmentsByMemberId(
+        memberId: number,
+    ): Promise<number> {
         const result = await this.db
             .select({ count: count() })
             .from(Post)
             .where(
-                and(eq(Post.authorId, memberId), eq(Post.post_type, 'RECRUITMENT')),
+                and(
+                    eq(Post.authorId, memberId),
+                    eq(Post.post_type, 'RECRUITMENT'),
+                ),
             );
 
         return result[0]?.count || 0;
