@@ -14,10 +14,16 @@ import {
     GetMembersByPageSwagger,
     GetMembersSwagger,
     GetMemberSwagger,
+    GetScrappedRecruitmentsSwagger,
+    GetWrittenRecruitmentsSwagger,
+    GetParticipatedRecruitmentsSwagger,
     MemberControllerSwagger,
 } from '../swagger';
 import { GetMembersResponse } from '../dto/response/get-members.response';
 import { GetMemberResponse } from '../dto/response/get-member.response';
+import { RecruitmentSummaryResponse } from '../dto/response/recruitment-summary.response';
+import { CurrentMember } from '../../common/decorators/current-member.decorator';
+import { PagePaginationResponse } from '../../common/response/page-pagination.response';
 
 @Controller('member')
 @MemberControllerSwagger
@@ -50,5 +56,47 @@ export class MemberController {
     async getMemberById(@Param('id') id: number) {
         const memberById = await this.memberService.findOneById(id);
         return GetMemberResponse.from(memberById);
+    }
+
+    @Get('my/scrapped-recruitments')
+    @GetScrappedRecruitmentsSwagger
+    async getScrappedRecruitments(
+        @CurrentMember() memberId: number,
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize?: number,
+    ) {
+        return await this.memberService.getMyScrappedRecruitments(
+            memberId,
+            page,
+            pageSize,
+        );
+    }
+
+    @Get('my/written-recruitments')
+    @GetWrittenRecruitmentsSwagger
+    async getWrittenRecruitments(
+        @CurrentMember() memberId: number,
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize?: number,
+    ) {
+        return await this.memberService.getMyWrittenRecruitments(
+            memberId,
+            page,
+            pageSize,
+        );
+    }
+
+    @Get('my/participated-recruitments')
+    @GetParticipatedRecruitmentsSwagger
+    async getParticipatedRecruitments(
+        @CurrentMember() memberId: number,
+        @Query('page') page: number = 1,
+        @Query('pageSize') pageSize?: number,
+    ) {
+        return await this.memberService.getMyParticipatedRecruitments(
+            memberId,
+            page,
+            pageSize,
+        );
     }
 }
