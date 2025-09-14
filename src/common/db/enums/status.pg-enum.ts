@@ -1,5 +1,5 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { StatusEnum } from '../../enums/status.enum';
+import { StatusEnum } from '../../enums';
 
 export const statusPgEnum = pgEnum(
     'status',

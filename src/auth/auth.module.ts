@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { JwtStrategy } from './strategies/jwt.strategy';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { JwtStrategy } from './strategies';
+import { JwtAuthGuard } from './guards';
 import { JwtModule } from '@nestjs/jwt';
 import { MemberModule } from 'src/member/member.module';
 

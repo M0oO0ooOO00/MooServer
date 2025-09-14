@@ -9,7 +9,7 @@ import { Gender, GenderDescription } from '../../../common/enums/gender.enum';
 import {
     PostType,
     PostTypeDescription,
-} from '../../../post/enums/post-type.enum';
+} from '../../../common/enums/post-type.enum';
 
 // Base interfaces for type safety
 interface MemberDetailInfo {

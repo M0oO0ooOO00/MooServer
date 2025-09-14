@@ -1,5 +1,5 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { PostType } from '../../../post/enums/post-type.enum';
+import { PostType } from '../../enums';
 
 export const postTypePgEnum = pgEnum(
     'post_type',
