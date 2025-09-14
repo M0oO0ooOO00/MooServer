@@ -1,15 +1,7 @@
-import {
-    Controller,
-    DefaultValuePipe,
-    Get,
-    Param,
-    ParseIntPipe,
-    Query,
-} from '@nestjs/common';
+import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminService } from '../service';
 import { MemberService } from '../../member/service';
-import { MemberDetailResponse } from '../dto';
 import {
     GetMemberDetailSwagger,
     GetMembersByPageSwagger,
@@ -27,9 +19,8 @@ export class AdminController {
     @Get('/members')
     @GetMembersByPageSwagger
     async getAllMembersByPage(
-        @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
-        @Query('pageSize', new DefaultValuePipe(10), ParseIntPipe)
-        pageSize: number,
+        @Query('page', ParseIntPipe) page: number = 1,
+        @Query('pageSize', ParseIntPipe) pageSize?: number,
     ) {
         return await this.memberService.findAllByPage(page, pageSize);
     }
