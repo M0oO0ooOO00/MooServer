@@ -1,6 +1,7 @@
 export * from './config';
 export * from './db/constants';
 export * from './db/enums';
+export * from './db/base.entity';
 export * from './decorators';
 export * from './dto';
 export * from './enums';
