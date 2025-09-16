@@ -226,9 +226,7 @@ export class MemberService {
                 authorNickname:
                     recruitment.authorNickname ||
                     MemberService.DEFAULT_NICKNAME,
-                gameDateTime: recruitment.gameDateTime instanceof Date
-                    ? recruitment.gameDateTime.toISOString()
-                    : new Date(recruitment.gameDateTime).toISOString(),
+                gameDateTime: recruitment.gameDateTime,
             }),
         );
 

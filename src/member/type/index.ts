@@ -1,7 +1,7 @@
 export type RecruitmentQueryResult = {
     title: string;
     gameDate: string;
-    gameDateTime: Date;
+    gameDateTime: string;
     teamHome: string;
     teamAway: string;
     authorNickname: string | null;
