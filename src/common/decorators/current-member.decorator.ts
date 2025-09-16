@@ -9,12 +9,12 @@ export const CurrentMember = createParamDecorator(
         const request = ctx.switchToHttp().getRequest();
         const user = request.user;
 
-        if (!user || !user.id) {
+        if (!user || !user.memberId) {
             throw new NotFoundException(
                 '로그인한 회원 정보를 찾을 수 없습니다.',
             );
         }
 
-        return user.id;
+        return user.memberId;
     },
 );
