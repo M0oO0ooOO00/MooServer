@@ -11,7 +11,7 @@ import {
     GenderDescription,
     PostType,
     PostTypeDescription,
-} from '../../../common/enums';
+} from '../../../common';
 
 interface MemberDetailInfo {
     id: number;
