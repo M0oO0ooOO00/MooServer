@@ -7,13 +7,14 @@ import {
     ApiInternalServerErrorResponse,
     ApiBearerAuth,
 } from '@nestjs/swagger';
-import { GetMyProfileResponse } from '../dto/response/get-my-profile.response';
-import { ErrorResponseDto } from '../../common/dto/error-response.dto';
+import { GetMyProfileResponse } from '../dto';
+import { ErrorResponseDto } from '../../common';
 
 export const GetMyProfileSwagger = applyDecorators(
     ApiOperation({
         summary: '내 프로필 정보 조회',
-        description: '로그인한 사용자의 프로필 정보(닉네임, 응원 팀, 로그인 방법, 누적 경고 횟수)를 조회합니다.',
+        description:
+            '로그인한 사용자의 프로필 정보(닉네임, 응원 팀, 로그인 방법, 누적 경고 횟수)를 조회합니다.',
     }),
     ApiBearerAuth(),
     ApiOkResponse({
