@@ -153,6 +153,7 @@ export class MemberRepository {
         const baseQuery = this.createRecruitmentSelectQuery()
             .from(Scrap)
             .innerJoin(Post, eq(Scrap.postId, Post.id))
+            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
             .where(
                 and(
                     eq(Scrap.memberId, memberId),
@@ -170,6 +171,7 @@ export class MemberRepository {
     ): Promise<RecruitmentQueryResult[]> {
         const baseQuery = this.createRecruitmentSelectQuery()
             .from(Post)
+            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
             .where(
                 and(
                     eq(Post.authorId, memberId),
@@ -191,6 +193,7 @@ export class MemberRepository {
                 RecruitmentDetail,
                 eq(Participation.recruitmentDetailId, RecruitmentDetail.id),
             )
+            .innerJoin(Post, eq(RecruitmentDetail.postId, Post.id))
             .where(eq(Participation.memberId, memberId));
 
         return this.executeRecruitmentQuery(baseQuery, page, pageSize);
@@ -264,7 +267,6 @@ export class MemberRepository {
         pageSize: number,
     ): Promise<RecruitmentQueryResult[]> {
         return baseQuery
-            .innerJoin(RecruitmentDetail, eq(Post.id, RecruitmentDetail.postId))
             .innerJoin(Member, eq(Post.authorId, Member.id))
             .leftJoin(Profile, eq(Member.id, Profile.memberId))
             .orderBy(desc(Post.createdAt))
