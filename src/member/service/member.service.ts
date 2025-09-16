@@ -149,26 +149,17 @@ export class MemberService {
         );
 
         if (!updatedProfile) {
-            const memberExists =
-                await this.memberRepository.findOneById(memberId);
-            if (!memberExists) {
-                throw new NotFoundException('존재하지 않는 회원입니다.');
-            }
             return this.getMyProfile(memberId);
         }
 
-        const { memberWithProfile, warns } =
-            await this.memberRepository.findMemberWithProfileAndWarns(memberId);
+        const member = await this.memberRepository.findOneById(memberId);
+        const warns = await this.warnService.findByMemberId(memberId);
 
-        if (!memberWithProfile || !memberWithProfile.profile) {
+        if (!member) {
             throw new NotFoundException('회원 정보를 찾을 수 없습니다.');
         }
 
-        return GetMyProfileResponse.from(
-            memberWithProfile.member,
-            memberWithProfile.profile,
-            warns,
-        );
+        return GetMyProfileResponse.from(member, updatedProfile, warns);
     }
 
     async getMyScrappedRecruitments(
