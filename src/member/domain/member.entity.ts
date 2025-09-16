@@ -9,9 +9,15 @@ import { Participation } from '../../participation/domain';
 import { Scrap } from '../../scrap/domain';
 import { Comment } from '../../comment/domain';
 import { Warn } from '../../admin/domain';
-import { rolePgEnum, genderPgEnum } from '../../common/db/enums';
+import {
+    rolePgEnum,
+    genderPgEnum,
+    oauthProviderPgEnum,
+    accountStatusPgEnum,
+} from '../../common/db/enums';
+import { AccountStatusEnum } from '../../common/enums';
 
-export { rolePgEnum, genderPgEnum };
+export { rolePgEnum, genderPgEnum, oauthProviderPgEnum, accountStatusPgEnum };
 
 export const Member = pgTable('member', {
     ...baseColumns,
@@ -21,6 +27,10 @@ export const Member = pgTable('member', {
     phoneNumber: text('phone_number'),
     gender: genderPgEnum('gender'),
     role: rolePgEnum('role').notNull(),
+    oauthProvider: oauthProviderPgEnum('oauth_provider').notNull(),
+    accountStatus: accountStatusPgEnum('account_status')
+        .notNull()
+        .default(AccountStatusEnum.ACTIVE),
 });
 
 export const memberRelations = relations(Member, ({ one, many }) => ({

@@ -44,6 +44,13 @@ export class GetMemberListResponse {
     })
     joinedAt: Date;
 
+    @ApiProperty({
+        description: '활동상태',
+        type: 'string',
+        example: 'ACTIVE',
+    })
+    accountStatus: string;
+
     constructor(
         id: number,
         nickname: string,
@@ -51,6 +58,7 @@ export class GetMemberListResponse {
         reportingCount: number,
         reportedCount: number,
         joinedAt: Date,
+        accountStatus: string,
     ) {
         this.id = id;
         this.nickname = nickname;
@@ -58,5 +66,6 @@ export class GetMemberListResponse {
         this.reportingCount = reportingCount;
         this.reportedCount = reportedCount;
         this.joinedAt = joinedAt;
+        this.accountStatus = accountStatus;
     }
 }

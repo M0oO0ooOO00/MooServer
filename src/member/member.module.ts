@@ -5,9 +5,10 @@ import { MemberRepository } from './repository';
 import { DbModule } from '../common/db/db.module';
 import { ReportModule } from '../report/report.module';
 import { PaginationService } from '../common/service';
+import { WarnModule } from '../warn/warn.module';
 
 @Module({
-    imports: [DbModule, ReportModule],
+    imports: [DbModule, ReportModule, WarnModule],
     providers: [MemberService, MemberRepository, PaginationService],
     exports: [MemberService],
     controllers: [MemberController],

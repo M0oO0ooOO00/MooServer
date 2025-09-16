@@ -1,15 +1,15 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
 import { baseColumns } from '../../common/db/base.entity';
-import { statusPgEnum } from '../../common/db/enums';
+import { postStatusPgEnum } from '../../common/db/enums';
 import { Member } from '../../member/domain';
 import { Post } from '../../post/domain';
 import { relations } from 'drizzle-orm';
 
-export { statusPgEnum };
+export { postStatusPgEnum };
 export const Comment = pgTable('comment', {
     ...baseColumns,
     content: text('content').notNull(),
-    status: statusPgEnum('status').notNull(),
+    postStatus: postStatusPgEnum('post_status').notNull(),
     authorId: integer('author_id')
         .notNull()
         .references(() => Member.id),
