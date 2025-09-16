@@ -1,13 +1,12 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MemberRepository } from '../repository';
-import { PagePaginationResponse } from '../../common/response/page-pagination.response';
-import { ReportRepository } from '../../report/repository';
+import { PagePaginationResponse, PaginationService } from '../../common';
 import {
     GetMemberListResponse,
     GetMyProfileResponse,
+    RecruitmentSummaryResponse,
+    UpdateMyProfileRequest,
 } from '../dto';
-import { RecruitmentSummaryResponse, UpdateMyProfileRequest } from '../dto';
-import { PaginationService } from '../../common/service';
 import { RecruitmentQueryResult } from '../type';
 import { WarnService } from '../../warn/service';
 
@@ -144,14 +143,32 @@ export class MemberService {
         memberId: number,
         updateData: UpdateMyProfileRequest,
     ) {
-        const memberExists = await this.memberRepository.findOneById(memberId);
-        if (!memberExists) {
-            throw new NotFoundException('존재하지 않는 회원입니다.');
+        const updatedProfile = await this.memberRepository.updateProfile(
+            memberId,
+            updateData,
+        );
+
+        if (!updatedProfile) {
+            const memberExists =
+                await this.memberRepository.findOneById(memberId);
+            if (!memberExists) {
+                throw new NotFoundException('존재하지 않는 회원입니다.');
+            }
+            return this.getMyProfile(memberId);
         }
 
-        await this.memberRepository.updateProfile(memberId, updateData);
+        const { memberWithProfile, warns } =
+            await this.memberRepository.findMemberWithProfileAndWarns(memberId);
 
-        return this.getMyProfile(memberId);
+        if (!memberWithProfile || !memberWithProfile.profile) {
+            throw new NotFoundException('회원 정보를 찾을 수 없습니다.');
+        }
+
+        return GetMyProfileResponse.from(
+            memberWithProfile.member,
+            memberWithProfile.profile,
+            warns,
+        );
     }
 
     async getMyScrappedRecruitments(

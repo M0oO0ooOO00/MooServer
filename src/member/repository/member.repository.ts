@@ -3,7 +3,7 @@ import { eq, count, sql, desc, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Member } from '../domain';
 import { Profile } from '../domain';
-import { DATABASE_CONNECTION } from '../../common/db/constants';
+import { DATABASE_CONNECTION } from '../../common';
 import { Report, ReportCount } from '../../report/domain';
 import { Warn } from '../../admin/domain';
 import { Post, RecruitmentDetail } from '../../post/domain';
@@ -19,7 +19,8 @@ export class MemberRepository {
     constructor(
         @Inject(DATABASE_CONNECTION)
         private readonly db: ReturnType<typeof drizzle>,
-    ) {}
+    ) {
+    }
 
     async findAll(): Promise<MemberType[]> {
         return this.db.select().from(Member);
@@ -44,9 +45,22 @@ export class MemberRepository {
             .select({
                 id: Member.id,
                 nickname: Profile.nickname,
-                warningCount: sql<number>`COALESCE(COUNT(${Warn.id}), 0)::integer`,
-                reportingCount: sql<number>`COALESCE(${ReportCount.reportingCount}, 0)`,
-                reportedCount: sql<number>`COALESCE(${ReportCount.reportedCount}, 0)`,
+                warningCount: sql<number>`COALESCE(COUNT(
+                ${Warn.id}
+                ),
+                0
+                )
+                :
+                :
+                integer`,
+                reportingCount: sql<number>`COALESCE(
+                ${ReportCount.reportingCount},
+                0
+                )`,
+                reportedCount: sql<number>`COALESCE(
+                ${ReportCount.reportedCount},
+                0
+                )`,
                 joinedAt: Member.createdAt,
                 accountStatus: Member.accountStatus,
             })
@@ -252,7 +266,7 @@ export class MemberRepository {
     }
 
     async updateProfile(memberId: number, updateData: UpdateMyProfileRequest) {
-        const updateFields: any = {};
+        const updateFields: Partial<typeof Profile.$inferSelect> = {};
 
         if (updateData.nickname !== undefined) {
             updateFields.nickname = updateData.nickname;
@@ -263,22 +277,43 @@ export class MemberRepository {
         }
 
         if (Object.keys(updateFields).length === 0) {
-            return;
+            return null;
         }
 
-        await this.db
+        const updatedProfile = await this.db
             .update(Profile)
             .set({
                 ...updateFields,
-                updatedAt: sql`now()`,
+                updatedAt: sql`now
+                ()`,
             })
-            .where(eq(Profile.memberId, memberId));
+            .where(eq(Profile.memberId, memberId))
+            .returning();
+
+        return updatedProfile[0] || null;
+    }
+
+    async findMemberWithProfileAndWarns(memberId: number) {
+        const memberWithProfile = await this.findMemberWithProfile(memberId);
+        const warns = await this.db
+            .select()
+            .from(Warn)
+            .where(eq(Warn.memberId, memberId));
+
+        return {
+            memberWithProfile: memberWithProfile[0],
+            warns,
+        };
     }
 
     private createRecruitmentSelectQuery() {
         return this.db.select({
             title: Post.title,
-            gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
+            gameDate: sql<string>`TO_CHAR
+            (
+            ${RecruitmentDetail.gameDate},
+            'YYYY-MM-DD'
+            )`,
             gameDateTime: RecruitmentDetail.gameDate,
             teamHome: RecruitmentDetail.teamHome,
             teamAway: RecruitmentDetail.teamAway,
