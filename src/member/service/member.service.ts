@@ -1,5 +1,4 @@
 import {
-    BadRequestException,
     Inject,
     Injectable,
     NotFoundException,
@@ -11,7 +10,6 @@ import { GetMemberListResponse } from '../dto/response/get-member-list.response'
 import { RecruitmentSummaryResponse } from '../dto/response/recruitment-summary.response';
 import { PaginationService } from '../../common/service';
 import { RecruitmentQueryResult } from '../type';
-
 
 @Injectable()
 export class MemberService {
@@ -29,11 +27,9 @@ export class MemberService {
     }
 
     async findAllByPage(
-        page: number,
+        page: number = 1,
         pageSize: number = MemberService.DEFAULT_PAGE_SIZE,
     ) {
-        this.validatePageNumber(page);
-        this.validatePageSize(pageSize);
 
         const [membersWithDetails, totalMembersResult] = await Promise.all([
             this.memberRepository.findAllByPageWithDetails(page, pageSize),
@@ -51,19 +47,6 @@ export class MemberService {
         );
     }
 
-    private validatePageNumber(page: number): void {
-        if (page < 1) {
-            throw new BadRequestException('페이지는 1보다 커야합니다.');
-        }
-    }
-
-    private validatePageSize(pageSize: number): void {
-        if (pageSize < 1 || pageSize > 100) {
-            throw new BadRequestException(
-                '페이지 크기는 1~100 사이여야 합니다.',
-            );
-        }
-    }
 
     private extractTotalCount(totalMembersResult: { count: number }[]): number {
         return totalMembersResult[0]?.count || 0;
@@ -157,7 +140,7 @@ export class MemberService {
 
     async getMyScrappedRecruitments(
         memberId: number,
-        page: number,
+        page: number = 1,
         pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
         return this.getMyRecruitments(
@@ -179,7 +162,7 @@ export class MemberService {
 
     async getMyWrittenRecruitments(
         memberId: number,
-        page: number,
+        page: number = 1,
         pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
         return this.getMyRecruitments(
@@ -201,7 +184,7 @@ export class MemberService {
 
     async getMyParticipatedRecruitments(
         memberId: number,
-        page: number,
+        page: number = 1,
         pageSize: number = PaginationService.getDefaultRecruitmentPageSize(),
     ): Promise<PagePaginationResponse<RecruitmentSummaryResponse[]>> {
         return this.getMyRecruitments(
@@ -243,7 +226,9 @@ export class MemberService {
                 authorNickname:
                     recruitment.authorNickname ||
                     MemberService.DEFAULT_NICKNAME,
-                gameDateTime: recruitment.gameDateTime.toISOString(),
+                gameDateTime: recruitment.gameDateTime instanceof Date
+                    ? recruitment.gameDateTime.toISOString()
+                    : new Date(recruitment.gameDateTime).toISOString(),
             }),
         );
 
