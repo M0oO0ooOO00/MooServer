@@ -2,6 +2,7 @@ import { Controller, Get, Param, ParseIntPipe, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AdminService } from '../service';
 import { MemberService } from '../../member/service';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 import {
     GetMemberDetailSwagger,
     GetMembersByPageSwagger,
@@ -19,10 +20,9 @@ export class AdminController {
     @Get('/members')
     @GetMembersByPageSwagger
     async getAllMembersByPage(
-        @Query('page', ParseIntPipe) page: number = 1,
-        @Query('pageSize', ParseIntPipe) pageSize?: number,
+        @Query() paginationQuery: PaginationQueryDto,
     ) {
-        return await this.memberService.findAllByPage(page, pageSize);
+        return await this.memberService.findAllByPage(paginationQuery.page, paginationQuery.pageSize);
     }
 
     @Get('/members/:id')

@@ -21,9 +21,8 @@ import {
 } from '../swagger';
 import { GetMembersResponse } from '../dto/response/get-members.response';
 import { GetMemberResponse } from '../dto/response/get-member.response';
-import { RecruitmentSummaryResponse } from '../dto/response/recruitment-summary.response';
 import { CurrentMember } from '../../common/decorators/current-member.decorator';
-import { PagePaginationResponse } from '../../common/response/page-pagination.response';
+import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 
 @Controller('member')
 @MemberControllerSwagger
@@ -47,8 +46,11 @@ export class MemberController {
 
     @Get()
     @GetMembersByPageSwagger
-    async getMembersByPage(@Query('page', ParseIntPipe) page: number = 1) {
-        return await this.memberService.findAllByPage(page);
+    async getMembersByPage(@Query() paginationQuery: PaginationQueryDto) {
+        return await this.memberService.findAllByPage(
+            paginationQuery.page,
+            paginationQuery.pageSize,
+        );
     }
 
     @Get(':id')
@@ -62,13 +64,12 @@ export class MemberController {
     @GetScrappedRecruitmentsSwagger
     async getScrappedRecruitments(
         @CurrentMember() memberId: number,
-        @Query('page') page: number = 1,
-        @Query('pageSize') pageSize?: number,
+        @Query() paginationQuery: PaginationQueryDto,
     ) {
         return await this.memberService.getMyScrappedRecruitments(
             memberId,
-            page,
-            pageSize,
+            paginationQuery.page,
+            paginationQuery.pageSize,
         );
     }
 
@@ -76,13 +77,12 @@ export class MemberController {
     @GetWrittenRecruitmentsSwagger
     async getWrittenRecruitments(
         @CurrentMember() memberId: number,
-        @Query('page') page: number = 1,
-        @Query('pageSize') pageSize?: number,
+        @Query() paginationQuery: PaginationQueryDto,
     ) {
         return await this.memberService.getMyWrittenRecruitments(
             memberId,
-            page,
-            pageSize,
+            paginationQuery.page,
+            paginationQuery.pageSize,
         );
     }
 
@@ -90,13 +90,12 @@ export class MemberController {
     @GetParticipatedRecruitmentsSwagger
     async getParticipatedRecruitments(
         @CurrentMember() memberId: number,
-        @Query('page') page: number = 1,
-        @Query('pageSize') pageSize?: number,
+        @Query() paginationQuery: PaginationQueryDto,
     ) {
         return await this.memberService.getMyParticipatedRecruitments(
             memberId,
-            page,
-            pageSize,
+            paginationQuery.page,
+            paginationQuery.pageSize,
         );
     }
 }
