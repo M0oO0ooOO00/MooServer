@@ -10,8 +10,7 @@ import {
     UpdateMyProfileSwagger,
     MemberControllerSwagger,
 } from '../swagger';
-import { CurrentMember } from '../../common/decorators/current-member.decorator';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { CurrentMember, PaginationQueryDto } from '../../common';
 
 @Controller('member')
 @MemberControllerSwagger
@@ -52,6 +51,7 @@ export class MemberController {
     ) {
         return await this.memberService.getMyScrappedRecruitments(
             memberId,
+            paginationQuery.page,
             paginationQuery.pageSize,
         );
     }
