@@ -4,14 +4,15 @@ import { Profile } from '../../../member/domain';
 import { Warn } from '../../domain';
 import { Report } from '../../../report/domain';
 import { Post } from '../../../post/domain';
-import { Team, TeamDescription } from '../../../common/enums/team.enum';
-import { Gender, GenderDescription } from '../../../common/enums/gender.enum';
 import {
+    Team,
+    TeamDescription,
+    Gender,
+    GenderDescription,
     PostType,
     PostTypeDescription,
-} from '../../../common/enums/post-type.enum';
+} from '../../../common/enums';
 
-// Base interfaces for type safety
 interface MemberDetailInfo {
     id: number;
     name: string;
@@ -22,6 +23,7 @@ interface MemberDetailInfo {
     age: number | null;
     phoneNumber: string | null;
     joinedAt: Date;
+    accountStatus: string;
 }
 
 interface WarnRecord {
@@ -253,6 +255,13 @@ export class MemberDetailResponse
     joinedAt: Date;
 
     @ApiProperty({
+        description: '활동상태',
+        type: 'string',
+        example: 'ACTIVE',
+    })
+    accountStatus: string;
+
+    @ApiProperty({
         description: '누적 경고 횟수',
         type: 'integer',
         example: 2,
@@ -334,6 +343,7 @@ export class MemberDetailResponse
             : null;
         dto.phoneNumber = member.phoneNumber;
         dto.joinedAt = member.createdAt;
+        dto.accountStatus = member.accountStatus;
 
         // 통계 정보
         dto.totalWarnCount = statistics.totalWarnCount;

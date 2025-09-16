@@ -8,11 +8,12 @@ import { Scrap } from '../../../scrap/domain';
 import { Participation } from '../../../participation/domain';
 import {
     Gender,
+    OAuthProvider,
     PostType,
     RecruitmentRoleEnum,
     ReportType,
     Role,
-    StatusEnum,
+    PostStatusEnum,
     Team,
 } from '../../enums';
 import type { InferInsertModel } from 'drizzle-orm';
@@ -102,6 +103,11 @@ export async function seeding() {
             Gender.FEMALE,
             Gender.OTHER,
         ]);
+        const OAuth = getRandomElement([
+            OAuthProvider.GOOGLE,
+            OAuthProvider.KAKAO,
+            OAuthProvider.NAVER,
+        ]);
         memberData.push({
             name: `User${i}`,
             email: `user${i}@example.com`,
@@ -109,6 +115,7 @@ export async function seeding() {
             phoneNumber: `010-${1000 + Math.floor(Math.random() * 9000)}-${1000 + Math.floor(Math.random() * 9000)}`,
             gender,
             role,
+            oauthProvider: OAuth,
             createdAt: getRandomDate(new Date('2024-01-01'), new Date()),
             updatedAt: getRandomDate(new Date('2024-01-01'), new Date()),
         });
@@ -209,12 +216,12 @@ export async function seeding() {
     const postData: InferInsertModel<typeof Post>[] = [];
     for (let i = 1; i <= 30; i++) {
         const author = getRandomElement(insertedMembers);
-        const status =
-            Math.random() > 0.3 ? StatusEnum.ACTIVE : StatusEnum.CLOSE; // 70% 활성, 30% 비활성
+        const postStatus =
+            Math.random() > 0.3 ? PostStatusEnum.ACTIVE : PostStatusEnum.CLOSE; // 70% 활성, 30% 비활성
         postData.push({
             title: getRandomElement(GAME_TITLES),
             post_type: PostType.RECRUITMENT,
-            status,
+            postStatus,
             authorId: author.id,
             createdAt: getRandomDate(new Date('2024-01-01'), new Date()),
             updatedAt: getRandomDate(new Date('2024-01-01'), new Date()),

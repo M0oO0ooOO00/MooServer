@@ -2,7 +2,7 @@ import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { MemberDetailResponse } from '../dto';
 
-export const GetMemberDetailSwagger = applyDecorators(
+export const GetMemberByIdSwagger = applyDecorators(
     ApiOperation({
         summary: '회원 상세 정보 조회',
         description:

@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { AdminService } from './service';
 import { AdminController } from './controller';
 import { MemberModule } from '../member/member.module';
-import { PaginationService } from '../common/service/pagination.service';
+import { PaginationService } from '../common/service';
+import { WarnModule } from '../warn/warn.module';
 
 @Module({
-    imports: [MemberModule],
+    imports: [MemberModule, WarnModule],
     controllers: [AdminController],
     providers: [AdminService, PaginationService],
 })

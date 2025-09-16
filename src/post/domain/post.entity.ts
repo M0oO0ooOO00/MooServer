@@ -7,15 +7,15 @@ import { RecruitmentDetail } from './recruitment-detail.entity';
 import { PostImage } from './post-image.entity';
 import { Scrap } from '../../scrap/domain';
 import { Comment } from '../../comment/domain';
-import { postTypePgEnum, statusPgEnum } from '../../common/db/enums';
+import { postTypePgEnum, postStatusPgEnum } from '../../common/db/enums';
 
-export { statusPgEnum, postTypePgEnum };
+export { postStatusPgEnum, postTypePgEnum };
 
 export const Post = pgTable('post', {
     ...baseColumns,
     title: text('title').notNull(),
     post_type: postTypePgEnum('post_type').notNull(),
-    status: statusPgEnum('status').notNull(),
+    postStatus: postStatusPgEnum('post_status').notNull(),
     authorId: integer('author_id')
         .notNull()
         .references(() => Member.id),

@@ -1,4 +1,4 @@
-export enum StatusEnum {
+export enum PostStatusEnum {
     ACTIVE = 'ACTIVE',
     CLOSE = 'CLOSE',
     DELETED = 'DELETED',
@@ -8,10 +8,10 @@ export enum StatusEnum {
 }
 
 export const StatusEnumDescription = {
-    [StatusEnum.ACTIVE]: '활성화',
-    [StatusEnum.CLOSE]: '마감',
-    [StatusEnum.DELETED]: '삭제',
-    [StatusEnum.HIDDEN]: '관리자에 의해 숨김처리',
-    [StatusEnum.BLOCKED]: '신고로 인해 차단',
-    [StatusEnum.DRAFT]: '임시저장',
+    [PostStatusEnum.ACTIVE]: '활성화',
+    [PostStatusEnum.CLOSE]: '마감',
+    [PostStatusEnum.DELETED]: '삭제',
+    [PostStatusEnum.HIDDEN]: '관리자에 의해 숨김처리',
+    [PostStatusEnum.BLOCKED]: '신고로 인해 차단',
+    [PostStatusEnum.DRAFT]: '임시저장',
 } as const;

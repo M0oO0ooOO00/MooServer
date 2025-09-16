@@ -1,5 +1,5 @@
 export * from './recruitment-role.pg-enum';
-export * from './status.pg-enum';
+export * from './post-status.pg-enum';
 export * from './post-type.pg-enum';
 export * from './role.pg-enum';
 export * from './gender.pg-enum';
@@ -8,3 +8,5 @@ export * from './ticketing-type.pg-enum';
 export * from './report-type.pg-enum';
 export * from './team.pg-enum';
 export * from './stadium.pg-enum';
+export * from './oauth-provider.pg-enum';
+export * from './account-status.pg-enum';

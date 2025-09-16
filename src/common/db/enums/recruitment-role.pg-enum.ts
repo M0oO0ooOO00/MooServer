@@ -1,5 +1,5 @@
 import { pgEnum } from 'drizzle-orm/pg-core';
-import { RecruitmentRoleEnum } from '../../enums/recruitment-role.enum';
+import { RecruitmentRoleEnum } from '../../enums';
 
 export const recruitmentPgEnum = pgEnum(
     'recruitment_role',
