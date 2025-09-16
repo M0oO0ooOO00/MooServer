@@ -1,26 +1,15 @@
-import {
-    Body,
-    Controller,
-    Get,
-    Param,
-    ParseIntPipe,
-    Post,
-    Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Query } from '@nestjs/common';
 import { MemberService } from '../service';
-import { CreateMemberRequest } from '../dto/request/create-member.request';
+import { CreateMemberRequest, UpdateMyProfileRequest } from '../dto';
 import {
     CreateMemberSwagger,
-    GetMembersByPageSwagger,
-    GetMembersSwagger,
-    GetMemberSwagger,
+    GetMyProfileSwagger,
     GetScrappedRecruitmentsSwagger,
     GetWrittenRecruitmentsSwagger,
     GetParticipatedRecruitmentsSwagger,
+    UpdateMyProfileSwagger,
     MemberControllerSwagger,
 } from '../swagger';
-import { GetMembersResponse } from '../dto/response/get-members.response';
-import { GetMemberResponse } from '../dto/response/get-member.response';
 import { CurrentMember } from '../../common/decorators/current-member.decorator';
 import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
 
@@ -37,27 +26,22 @@ export class MemberController {
         await this.memberService.createMember(name, email);
     }
 
-    @Get('all')
-    @GetMembersSwagger
-    async getAllMembers() {
-        const members = await this.memberService.findAll();
-        return GetMembersResponse.from(members);
+    @Get('my')
+    @GetMyProfileSwagger
+    async getMyInfo(@CurrentMember() memberId: number) {
+        return await this.memberService.getMyProfile(memberId);
     }
 
-    @Get()
-    @GetMembersByPageSwagger
-    async getMembersByPage(@Query() paginationQuery: PaginationQueryDto) {
-        return await this.memberService.findAllByPage(
-            paginationQuery.page,
-            paginationQuery.pageSize,
+    @Put('my')
+    @UpdateMyProfileSwagger
+    async updateMyProfile(
+        @CurrentMember() memberId: number,
+        @Body() updateProfileDto: UpdateMyProfileRequest,
+    ) {
+        return await this.memberService.updateMyProfile(
+            memberId,
+            updateProfileDto,
         );
-    }
-
-    @Get(':id')
-    @GetMemberSwagger
-    async getMemberById(@Param('id') id: number) {
-        const memberById = await this.memberService.findOneById(id);
-        return GetMemberResponse.from(memberById);
     }
 
     @Get('my/scrapped-recruitments')
@@ -68,7 +52,6 @@ export class MemberController {
     ) {
         return await this.memberService.getMyScrappedRecruitments(
             memberId,
-            paginationQuery.page,
             paginationQuery.pageSize,
         );
     }

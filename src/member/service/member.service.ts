@@ -1,15 +1,15 @@
-import {
-    Inject,
-    Injectable,
-    NotFoundException,
-} from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MemberRepository } from '../repository';
 import { PagePaginationResponse } from '../../common/response/page-pagination.response';
 import { ReportRepository } from '../../report/repository';
-import { GetMemberListResponse } from '../dto/response/get-member-list.response';
-import { RecruitmentSummaryResponse } from '../dto/response/recruitment-summary.response';
+import {
+    GetMemberListResponse,
+    GetMyProfileResponse,
+} from '../dto';
+import { RecruitmentSummaryResponse, UpdateMyProfileRequest } from '../dto';
 import { PaginationService } from '../../common/service';
 import { RecruitmentQueryResult } from '../type';
+import { WarnService } from '../../warn/service';
 
 @Injectable()
 export class MemberService {
@@ -18,19 +18,14 @@ export class MemberService {
 
     constructor(
         @Inject() private readonly memberRepository: MemberRepository,
-        @Inject() private readonly reportRepository: ReportRepository,
         @Inject() private readonly paginationService: PaginationService,
+        @Inject() private readonly warnService: WarnService,
     ) {}
-
-    async findAll() {
-        return await this.memberRepository.findAll();
-    }
 
     async findAllByPage(
         page: number = 1,
         pageSize: number = MemberService.DEFAULT_PAGE_SIZE,
     ) {
-
         const [membersWithDetails, totalMembersResult] = await Promise.all([
             this.memberRepository.findAllByPageWithDetails(page, pageSize),
             this.memberRepository.count(),
@@ -46,7 +41,6 @@ export class MemberService {
             totalMembers,
         );
     }
-
 
     private extractTotalCount(totalMembersResult: { count: number }[]): number {
         return totalMembersResult[0]?.count || 0;
@@ -72,6 +66,7 @@ export class MemberService {
             member.reportingCount,
             member.reportedCount,
             member.joinedAt,
+            member.accountStatus,
         );
     }
 
@@ -87,16 +82,6 @@ export class MemberService {
             pageSize,
             totalMembers,
         );
-    }
-
-    async findOneById(id: number) {
-        const memberById = await this.memberRepository.findOneById(id);
-        const reportsByMemberId =
-            await this.reportRepository.findByMemberId(id);
-        if (!memberById) {
-            throw new NotFoundException('존재하지 않는 회원입니다.');
-        }
-        return { ...memberById, reports: reportsByMemberId };
     }
 
     async createMember(name: string, email: string) {
@@ -136,6 +121,37 @@ export class MemberService {
             reportedRecords,
             statistics,
         };
+    }
+
+    async getMyProfile(memberId: number) {
+        const memberWithProfile =
+            await this.memberRepository.findMemberWithProfile(memberId);
+        const memberWarn = await this.warnService.findByMemberId(memberId);
+
+        const result = memberWithProfile[0];
+        if (!result || !result.profile) {
+            throw new NotFoundException('회원 정보를 찾을 수 없습니다.');
+        }
+
+        return GetMyProfileResponse.from(
+            result.member,
+            result.profile,
+            memberWarn,
+        );
+    }
+
+    async updateMyProfile(
+        memberId: number,
+        updateData: UpdateMyProfileRequest,
+    ) {
+        const memberExists = await this.memberRepository.findOneById(memberId);
+        if (!memberExists) {
+            throw new NotFoundException('존재하지 않는 회원입니다.');
+        }
+
+        await this.memberRepository.updateProfile(memberId, updateData);
+
+        return this.getMyProfile(memberId);
     }
 
     async getMyScrappedRecruitments(

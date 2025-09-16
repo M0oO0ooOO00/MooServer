@@ -1,53 +1,23 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { MemberDetailResponse } from '../dto';
 
-export const GetMemberByIdSwagger = applyDecorators(
+export const GetMemberDetailSwagger = applyDecorators(
     ApiOperation({
-        summary: '특정 회원 기본 정보 조회',
-        description: '관리자가 특정 회원의 기본 정보를 조회합니다.',
+        summary: '회원 상세 정보 조회',
+        description:
+            '관리자가 특정 회원의 상세 정보를 조회합니다. 회원 기본 정보, 경고 기록, 신고 기록 등이 포함됩니다.',
     }),
     ApiParam({
-        name: 'id',
+        name: 'memberId',
         type: 'integer',
         description: '조회할 회원의 ID',
         example: 1,
     }),
     ApiResponse({
         status: 200,
-        description: '회원 정보 조회 성공',
-        schema: {
-            type: 'object',
-            properties: {
-                id: { type: 'number', example: 1 },
-                name: { type: 'string', example: '홍길동' },
-                email: { type: 'string', example: 'hong@example.com' },
-                birthDate: { type: 'string', example: '1990-01-01' },
-                phoneNumber: { type: 'string', example: '010-1234-5678' },
-                gender: { type: 'string', example: 'MALE' },
-                role: { type: 'string', example: 'USER' },
-                createdAt: { 
-                    type: 'string', 
-                    format: 'date-time',
-                    example: '2024-01-01T09:00:00Z'
-                },
-                updatedAt: { 
-                    type: 'string', 
-                    format: 'date-time',
-                    example: '2024-01-01T09:00:00Z'
-                },
-                reports: {
-                    type: 'array',
-                    items: {
-                        type: 'object',
-                        properties: {
-                            id: { type: 'number', example: 1 },
-                            reportType: { type: 'string', example: '스팸/도배' },
-                            content: { type: 'string', example: '신고 내용' },
-                        },
-                    },
-                },
-            },
-        },
+        description: '회원 상세 정보 조회 성공',
+        type: MemberDetailResponse,
     }),
     ApiResponse({
         status: 404,

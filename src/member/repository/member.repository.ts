@@ -10,6 +10,7 @@ import { Post, RecruitmentDetail } from '../../post/domain';
 import { Scrap } from '../../scrap/domain';
 import { Participation } from '../../participation/domain';
 import { RecruitmentQueryResult } from '../type';
+import { UpdateMyProfileRequest } from '../dto';
 
 type MemberType = typeof Member.$inferSelect;
 
@@ -47,6 +48,7 @@ export class MemberRepository {
                 reportingCount: sql<number>`COALESCE(${ReportCount.reportingCount}, 0)`,
                 reportedCount: sql<number>`COALESCE(${ReportCount.reportedCount}, 0)`,
                 joinedAt: Member.createdAt,
+                accountStatus: Member.accountStatus,
             })
             .from(Member)
             .leftJoin(Profile, eq(Member.id, Profile.memberId))
@@ -58,6 +60,7 @@ export class MemberRepository {
                 ReportCount.reportingCount,
                 ReportCount.reportedCount,
                 Member.createdAt,
+                Member.accountStatus,
             )
             .limit(pageSize)
             .offset((page - 1) * pageSize);
@@ -248,6 +251,30 @@ export class MemberRepository {
         return result[0]?.count || 0;
     }
 
+    async updateProfile(memberId: number, updateData: UpdateMyProfileRequest) {
+        const updateFields: any = {};
+
+        if (updateData.nickname !== undefined) {
+            updateFields.nickname = updateData.nickname;
+        }
+
+        if (updateData.supportTeam !== undefined) {
+            updateFields.supportTeam = updateData.supportTeam;
+        }
+
+        if (Object.keys(updateFields).length === 0) {
+            return;
+        }
+
+        await this.db
+            .update(Profile)
+            .set({
+                ...updateFields,
+                updatedAt: sql`now()`,
+            })
+            .where(eq(Profile.memberId, memberId));
+    }
+
     private createRecruitmentSelectQuery() {
         return this.db.select({
             title: Post.title,
@@ -256,7 +283,7 @@ export class MemberRepository {
             teamHome: RecruitmentDetail.teamHome,
             teamAway: RecruitmentDetail.teamAway,
             authorNickname: Profile.nickname,
-            postStatus: Post.status,
+            postStatus: Post.postStatus,
             createdAt: Post.createdAt,
         });
     }
