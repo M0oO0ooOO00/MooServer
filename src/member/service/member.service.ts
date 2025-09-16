@@ -152,8 +152,10 @@ export class MemberService {
             return this.getMyProfile(memberId);
         }
 
-        const member = await this.memberRepository.findOneById(memberId);
-        const warns = await this.warnService.findByMemberId(memberId);
+        const [member, warns] = await Promise.all([
+            this.memberRepository.findOneById(memberId),
+            this.warnService.findByMemberId(memberId),
+        ]);
 
         if (!member) {
             throw new NotFoundException('회원 정보를 찾을 수 없습니다.');
