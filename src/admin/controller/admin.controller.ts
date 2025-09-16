@@ -9,16 +9,13 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { AdminService } from '../service';
 import { MemberService } from '../../member/service';
-import { PaginationQueryDto } from '../../common/dto/pagination-query.dto';
+import { PaginationQueryDto, RolesGuard, Roles, Role } from '../../common';
 import { GetMemberByIdSwagger, GetMembersByPageSwagger } from '../swagger';
-import { RolesGuard } from '../../common/guards';
-import { Roles } from '../../common/decorators';
-import { Role } from '../../common/enums';
 
 @ApiTags('관리자')
 @Controller('admin')
-// @UseGuards(RolesGuard)
-// @Roles(Role.ADMIN)
+@UseGuards(RolesGuard)
+@Roles(Role.ADMIN)
 export class AdminController {
     constructor(
         private readonly adminService: AdminService,
