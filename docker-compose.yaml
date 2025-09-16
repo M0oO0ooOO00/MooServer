@@ -1,3 +1,5 @@
+name: jikgwan
+
 services:
   postgres:
     image: postgres
