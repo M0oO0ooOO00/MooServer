@@ -30,7 +30,7 @@ export class LoggingInterceptor implements NestInterceptor {
             }),
             catchError((error) => {
                 const delay = Date.now() - now;
-                const statusCode = error.getStatus() ? error.getStatus() : 500;
+                const statusCode = error.getStatus?.() || 500;
                 const errorMessage = error.message || 'Internal Server Error';
                 const errorResponse = error.response
                     ? JSON.stringify(error.response)
