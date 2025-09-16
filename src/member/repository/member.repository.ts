@@ -19,8 +19,7 @@ export class MemberRepository {
     constructor(
         @Inject(DATABASE_CONNECTION)
         private readonly db: ReturnType<typeof drizzle>,
-    ) {
-    }
+    ) {}
 
     async findAll(): Promise<MemberType[]> {
         return this.db.select().from(Member);
@@ -45,22 +44,9 @@ export class MemberRepository {
             .select({
                 id: Member.id,
                 nickname: Profile.nickname,
-                warningCount: sql<number>`COALESCE(COUNT(
-                ${Warn.id}
-                ),
-                0
-                )
-                :
-                :
-                integer`,
-                reportingCount: sql<number>`COALESCE(
-                ${ReportCount.reportingCount},
-                0
-                )`,
-                reportedCount: sql<number>`COALESCE(
-                ${ReportCount.reportedCount},
-                0
-                )`,
+                warningCount: sql<number>`COALESCE(COUNT(${Warn.id}), 0)::integer`,
+                reportingCount: sql<number>`COALESCE(${ReportCount.reportingCount}, 0)`,
+                reportedCount: sql<number>`COALESCE(${ReportCount.reportedCount}, 0)`,
                 joinedAt: Member.createdAt,
                 accountStatus: Member.accountStatus,
             })
@@ -284,8 +270,7 @@ export class MemberRepository {
             .update(Profile)
             .set({
                 ...updateFields,
-                updatedAt: sql`now
-                ()`,
+                updatedAt: sql`now()`,
             })
             .where(eq(Profile.memberId, memberId))
             .returning();
@@ -309,11 +294,7 @@ export class MemberRepository {
     private createRecruitmentSelectQuery() {
         return this.db.select({
             title: Post.title,
-            gameDate: sql<string>`TO_CHAR
-            (
-            ${RecruitmentDetail.gameDate},
-            'YYYY-MM-DD'
-            )`,
+            gameDate: sql<string>`TO_CHAR(${RecruitmentDetail.gameDate}, 'YYYY-MM-DD')`,
             gameDateTime: RecruitmentDetail.gameDate,
             teamHome: RecruitmentDetail.teamHome,
             teamAway: RecruitmentDetail.teamAway,
