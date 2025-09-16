@@ -1,6 +1,6 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
-import { baseColumns } from '../../common/db/base.entity';
-import { postStatusPgEnum } from '../../common/db/enums';
+import { baseColumns } from '../../common';
+import { postStatusPgEnum } from '../../common';
 import { Member } from '../../member/domain';
 import { Post } from '../../post/domain';
 import { relations } from 'drizzle-orm';

@@ -1,5 +1,5 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
-import { baseColumns } from '../../common/db/base.entity';
+import { baseColumns } from '../../common';
 import { Post } from './post.entity';
 import { relations } from 'drizzle-orm';
 

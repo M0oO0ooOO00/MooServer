@@ -1,6 +1,6 @@
 import { integer, pgTable, timestamp, unique } from 'drizzle-orm/pg-core';
-import { baseColumns } from '../../common/db/base.entity';
-import { recruitmentPgEnum } from '../../common/db/enums';
+import { baseColumns } from '../../common';
+import { recruitmentPgEnum } from '../../common';
 import { Member } from '../../member/domain';
 import { RecruitmentDetail } from '../../post/domain';
 import { relations } from 'drizzle-orm';

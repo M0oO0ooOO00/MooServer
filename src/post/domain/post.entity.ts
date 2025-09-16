@@ -1,5 +1,5 @@
 import { integer, pgTable, text } from 'drizzle-orm/pg-core';
-import { baseColumns } from '../../common/db/base.entity';
+import { baseColumns } from '../../common';
 import { Member } from '../../member/domain';
 import { relations } from 'drizzle-orm';
 import { TipsDetail } from './tips-detail.entity';
@@ -7,7 +7,7 @@ import { RecruitmentDetail } from './recruitment-detail.entity';
 import { PostImage } from './post-image.entity';
 import { Scrap } from '../../scrap/domain';
 import { Comment } from '../../comment/domain';
-import { postTypePgEnum, postStatusPgEnum } from '../../common/db/enums';
+import { postTypePgEnum, postStatusPgEnum } from '../../common';
 
 export { postStatusPgEnum, postTypePgEnum };
 
