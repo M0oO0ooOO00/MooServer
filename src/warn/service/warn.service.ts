@@ -6,6 +6,6 @@ export class WarnService {
     constructor(private readonly warnRepository: WarnRepository) {}
 
     async findByMemberId(memberId: number) {
-        return await this.warnRepository.findByMemberID(memberId);
+        return await this.warnRepository.findByMemberId(memberId);
     }
 }
