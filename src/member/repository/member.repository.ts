@@ -278,19 +278,6 @@ export class MemberRepository {
         return updatedProfile[0] || null;
     }
 
-    async findMemberWithProfileAndWarns(memberId: number) {
-        const memberWithProfile = await this.findMemberWithProfile(memberId);
-        const warns = await this.db
-            .select()
-            .from(Warn)
-            .where(eq(Warn.memberId, memberId));
-
-        return {
-            memberWithProfile: memberWithProfile[0],
-            warns,
-        };
-    }
-
     private createRecruitmentSelectQuery() {
         return this.db.select({
             title: Post.title,
