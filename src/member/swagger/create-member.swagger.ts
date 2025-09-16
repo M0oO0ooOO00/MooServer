@@ -7,9 +7,8 @@ import {
     ApiConflictResponse,
     ApiInternalServerErrorResponse,
 } from '@nestjs/swagger';
-import { CreateMemberRequest } from '../dto/request/create-member.request';
-import { CreateMemberResponse } from '../dto/response/create-member.response';
-import { ErrorResponseDto } from '../../common/dto/error-response.dto';
+import { CreateMemberResponse, CreateMemberRequest } from '../dto';
+import { ErrorResponseDto } from '../../common';
 
 export const CreateMemberSwagger = applyDecorators(
     ApiOperation({
