@@ -3,7 +3,7 @@ import { eq, count, sql, desc, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Member } from '../domain';
 import { Profile } from '../domain';
-import { DATABASE_CONNECTION } from '../../common';
+import { DATABASE_CONNECTION, OAuthProvider, Role } from '../../common';
 import { Report, ReportCount } from '../../report/domain';
 import { Warn } from '../../admin/domain';
 import { Post, RecruitmentDetail } from '../../post/domain';
@@ -21,6 +21,20 @@ export class MemberRepository {
         private readonly db: ReturnType<typeof drizzle>,
     ) {}
 
+    async create(
+        name: string,
+        email: string,
+        role: Role,
+        oauthProvider: OAuthProvider,
+    ): Promise<MemberType> {
+        const [member] = await this.db
+            .insert(Member)
+            .values({ name, email, role, oauthProvider })
+            .returning();
+
+        return member ?? null;
+    }
+
     async findAll(): Promise<MemberType[]> {
         return this.db.select().from(Member);
     }
@@ -34,6 +48,24 @@ export class MemberRepository {
             .select()
             .from(Member)
             .where(eq(Member.id, id))
+            .limit(1);
+
+        return result[0] ?? null;
+    }
+
+    async findOneByEmailAndProvider(
+        email: string,
+        provider: OAuthProvider,
+    ): Promise<MemberType | null> {
+        const result = await this.db
+            .select()
+            .from(Member)
+            .where(
+                and(
+                    eq(Member.email, email),
+                    eq(Member.oauthProvider, provider),
+                ),
+            )
             .limit(1);
 
         return result[0] ?? null;
