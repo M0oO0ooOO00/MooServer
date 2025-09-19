@@ -369,6 +369,7 @@ export class MemberRepository {
                 phoneNumber: phoneNumber,
                 gender: gender,
                 signUpStatus: true,
+                updatedAt: sql`now()`,
             })
             .where(eq(Member.id, memberId))
             .execute();

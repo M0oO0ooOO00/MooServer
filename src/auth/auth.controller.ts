@@ -11,7 +11,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { JwtService } from '@nestjs/jwt';
 import * as process from 'node:process';
-import { SignUpCompleteRequest } from './dto/request/sign-up.complete.request';
+import { SignUpCompleteRequestDto } from './dto/request/sign-up.complete.request';
 
 @Controller('auth')
 export class AuthController {
@@ -39,20 +39,20 @@ export class AuthController {
             // 이미 회원가입이 완료된 계정의 경우
             // 토큰 만들고
             // 홈페이지 리다이렉트
-            const accessToken = this.generateToken(member);
-            return accessToken;
+            return this.generateToken(member);
         }
     }
 
     @Post('signup')
-    async completeSignUp(@Body() signUpCompleteRequest: SignUpCompleteRequest) {
+    async completeSignUp(
+        @Body() signUpCompleteRequestDto: SignUpCompleteRequestDto,
+    ) {
         const member = await this.authService.completeSignUp(
-            signUpCompleteRequest,
+            signUpCompleteRequestDto,
         );
 
-        const accessToken = this.generateToken(member);
-
-        return accessToken;
+        // 추후 쿠키 등등으로 변경
+        return this.generateToken(member);
     }
 
     private generateToken(member) {

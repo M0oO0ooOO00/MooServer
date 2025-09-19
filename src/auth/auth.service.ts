@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MemberRepository } from 'src/member/repository';
 import { OAuthProvider, Role } from '../common';
-import { SignUpCompleteRequest } from './dto/request/sign-up.complete.request';
+import { SignUpCompleteRequestDto } from './dto/request/sign-up.complete.request';
 
 export interface KakaoOAuthMember {
     snsId: string;
@@ -30,25 +30,26 @@ export class AuthService {
         return member;
     }
 
-    async completeSignUp(signUpCompleteRequest: SignUpCompleteRequest) {
+    async completeSignUp(signUpCompleteRequestDto: SignUpCompleteRequestDto) {
         const member = await this.memberRepository.findOneById(
-            signUpCompleteRequest.memberId,
+            signUpCompleteRequestDto.memberId,
         );
 
         if (!member) {
             throw new NotFoundException('해당 멤버가 존재하지 않습니다.');
         }
+
         await this.memberRepository.updateTempMemberInfo(
-            signUpCompleteRequest.memberId,
-            signUpCompleteRequest.birthDate,
-            signUpCompleteRequest.phoneNumber,
-            signUpCompleteRequest.gender,
+            signUpCompleteRequestDto.memberId,
+            signUpCompleteRequestDto.birthDate,
+            signUpCompleteRequestDto.phoneNumber,
+            signUpCompleteRequestDto.gender,
         );
 
         await this.memberRepository.createProfile(
-            signUpCompleteRequest.memberId,
-            signUpCompleteRequest.nickName,
-            signUpCompleteRequest.supportTeam,
+            signUpCompleteRequestDto.memberId,
+            signUpCompleteRequestDto.nickName,
+            signUpCompleteRequestDto.supportTeam,
         );
 
         return member;
