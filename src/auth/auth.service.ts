@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { MemberRepository } from '../member/member.repository';
+import { MemberRepository } from 'src/member/repository';
+import { OAuthProvider, Role } from '../common';
 
-interface KakaoOAuthMember {
+export interface KakaoOAuthMember {
     snsId: string;
     email: string;
     name: string;
-    provider: string;
+    provider: OAuthProvider;
 }
 
 @Injectable()
@@ -13,14 +14,18 @@ export class AuthService {
     constructor(private readonly memberRepository: MemberRepository) {}
 
     async validateKakaoLogin(user: KakaoOAuthMember) {
-        const existingMember = await this.memberRepository.findOneByEmail(
+        let member = await this.memberRepository.findOneByEmailAndProvider(
             user.email,
+            user.provider,
         );
 
-        if (existingMember) {
-            return existingMember;
-        }
+        member ??= await this.memberRepository.create(
+            user.name,
+            user.email,
+            Role.USER,
+            user.provider,
+        );
 
-        return this.memberRepository.create(user.name, user.email);
+        return member;
     }
 }

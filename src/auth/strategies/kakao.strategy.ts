@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { Injectable } from '@nestjs/common';
 import { Strategy, Profile } from 'passport-kakao';
 import { VerifyCallback } from 'passport-oauth2';
+import { OAuthProvider } from '../../common';
 
 @Injectable()
 export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
@@ -22,14 +23,12 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
         done: VerifyCallback,
     ) {
         const kakaoAccount = profile._json.kakao_account;
-        console.log('🔥 validate 실행');
-        console.log('profile:', JSON.stringify(profile, null, 2));
 
         const user = {
             snsId: profile.id,
             email: kakaoAccount?.email,
             name: kakaoAccount?.profile?.nickname,
-            provider: 'kakao',
+            provider: OAuthProvider.KAKAO,
         };
 
         done(null, user);
