@@ -10,7 +10,7 @@ import { WarnModule } from '../warn/warn.module';
 @Module({
     imports: [DbModule, ReportModule, WarnModule],
     providers: [MemberService, MemberRepository, PaginationService],
-    exports: [MemberService],
+    exports: [MemberService, MemberRepository],
     controllers: [MemberController],
 })
 export class MemberModule {}

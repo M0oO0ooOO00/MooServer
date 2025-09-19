@@ -3,7 +3,13 @@ import { eq, count, sql, desc, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Member } from '../domain';
 import { Profile } from '../domain';
-import { DATABASE_CONNECTION } from '../../common';
+import {
+    DATABASE_CONNECTION,
+    Gender,
+    OAuthProvider,
+    Role,
+    Team,
+} from '../../common';
 import { Report, ReportCount } from '../../report/domain';
 import { Warn } from '../../admin/domain';
 import { Post, RecruitmentDetail } from '../../post/domain';
@@ -13,6 +19,7 @@ import { RecruitmentQueryResult } from '../type';
 import { UpdateMyProfileRequest } from '../dto';
 
 type MemberType = typeof Member.$inferSelect;
+type ProfileType = typeof Profile.$inferSelect;
 
 @Injectable()
 export class MemberRepository {
@@ -20,6 +27,33 @@ export class MemberRepository {
         @Inject(DATABASE_CONNECTION)
         private readonly db: ReturnType<typeof drizzle>,
     ) {}
+
+    async create(
+        name: string,
+        email: string,
+        role: Role,
+        oauthProvider: OAuthProvider,
+    ): Promise<MemberType> {
+        const [member] = await this.db
+            .insert(Member)
+            .values({ name, email, role, oauthProvider })
+            .returning();
+
+        return member ?? null;
+    }
+
+    async createProfile(
+        memberId: number,
+        nickname: string,
+        supportTeam: Team,
+    ): Promise<ProfileType> {
+        const [profile] = await this.db
+            .insert(Profile)
+            .values({ nickname, supportTeam, memberId })
+            .returning();
+
+        return profile ?? null;
+    }
 
     async findAll(): Promise<MemberType[]> {
         return this.db.select().from(Member);
@@ -34,6 +68,24 @@ export class MemberRepository {
             .select()
             .from(Member)
             .where(eq(Member.id, id))
+            .limit(1);
+
+        return result[0] ?? null;
+    }
+
+    async findOneByEmailAndProvider(
+        email: string,
+        provider: OAuthProvider,
+    ): Promise<MemberType | null> {
+        const result = await this.db
+            .select()
+            .from(Member)
+            .where(
+                and(
+                    eq(Member.email, email),
+                    eq(Member.oauthProvider, provider),
+                ),
+            )
             .limit(1);
 
         return result[0] ?? null;
@@ -302,5 +354,24 @@ export class MemberRepository {
             .orderBy(desc(Post.createdAt))
             .limit(pageSize)
             .offset((page - 1) * pageSize);
+    }
+
+    async updateTempMemberInfo(
+        memberId: number,
+        birthDate: string,
+        phoneNumber: string,
+        gender: Gender,
+    ) {
+        return this.db
+            .update(Member)
+            .set({
+                birthDate: birthDate,
+                phoneNumber: phoneNumber,
+                gender: gender,
+                signUpStatus: true,
+                updatedAt: sql`now()`,
+            })
+            .where(eq(Member.id, memberId))
+            .execute();
     }
 }

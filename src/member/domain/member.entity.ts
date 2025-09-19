@@ -1,4 +1,4 @@
-import { pgTable, text } from 'drizzle-orm/pg-core';
+import { boolean, pgTable, text } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import { baseColumns } from '../../common/db/base.entity';
 import { Profile } from './profile.entity';
@@ -23,7 +23,7 @@ export const Member = pgTable('member', {
     ...baseColumns,
     name: text('name').notNull(),
     email: text('email').notNull(),
-    birthDate: text('birth_date').notNull(),
+    birthDate: text('birth_date'),
     phoneNumber: text('phone_number'),
     gender: genderPgEnum('gender'),
     role: rolePgEnum('role').notNull(),
@@ -31,6 +31,7 @@ export const Member = pgTable('member', {
     accountStatus: accountStatusPgEnum('account_status')
         .notNull()
         .default(AccountStatusEnum.ACTIVE),
+    signUpStatus: boolean('sign-up-status').default(false),
 });
 
 export const memberRelations = relations(Member, ({ one, many }) => ({
