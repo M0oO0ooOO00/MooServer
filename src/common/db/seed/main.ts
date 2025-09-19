@@ -116,6 +116,7 @@ export async function seeding() {
             gender,
             role,
             oauthProvider: OAuth,
+            signUpStatus: true,
             createdAt: getRandomDate(new Date('2024-01-01'), new Date()),
             updatedAt: getRandomDate(new Date('2024-01-01'), new Date()),
         });

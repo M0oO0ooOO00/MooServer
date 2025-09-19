@@ -3,7 +3,13 @@ import { eq, count, sql, desc, and } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Member } from '../domain';
 import { Profile } from '../domain';
-import { DATABASE_CONNECTION, OAuthProvider, Role } from '../../common';
+import {
+    DATABASE_CONNECTION,
+    Gender,
+    OAuthProvider,
+    Role,
+    Team,
+} from '../../common';
 import { Report, ReportCount } from '../../report/domain';
 import { Warn } from '../../admin/domain';
 import { Post, RecruitmentDetail } from '../../post/domain';
@@ -13,6 +19,7 @@ import { RecruitmentQueryResult } from '../type';
 import { UpdateMyProfileRequest } from '../dto';
 
 type MemberType = typeof Member.$inferSelect;
+type ProfileType = typeof Profile.$inferSelect;
 
 @Injectable()
 export class MemberRepository {
@@ -33,6 +40,19 @@ export class MemberRepository {
             .returning();
 
         return member ?? null;
+    }
+
+    async createProfile(
+        memberId: number,
+        nickname: string,
+        supportTeam: Team,
+    ): Promise<ProfileType> {
+        const [profile] = await this.db
+            .insert(Profile)
+            .values({ nickname, supportTeam, memberId })
+            .returning();
+
+        return profile ?? null;
     }
 
     async findAll(): Promise<MemberType[]> {
@@ -334,5 +354,23 @@ export class MemberRepository {
             .orderBy(desc(Post.createdAt))
             .limit(pageSize)
             .offset((page - 1) * pageSize);
+    }
+
+    async updateTempMemberInfo(
+        memberId: number,
+        birthDate: string,
+        phoneNumber: string,
+        gender: Gender,
+    ) {
+        return this.db
+            .update(Member)
+            .set({
+                birthDate: birthDate,
+                phoneNumber: phoneNumber,
+                gender: gender,
+                signUpStatus: true,
+            })
+            .where(eq(Member.id, memberId))
+            .execute();
     }
 }
