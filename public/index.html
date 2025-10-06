@@ -2,35 +2,153 @@
 <html>
     <head>
         <title>NestJS Chat</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 600px;
+                margin: 50px auto;
+                padding: 20px;
+            }
+            #loginSection {
+                margin-bottom: 20px;
+            }
+            #chatSection {
+                display: none;
+            }
+            #messages {
+                list-style: none;
+                padding: 0;
+                border: 1px solid #ccc;
+                height: 300px;
+                overflow-y: auto;
+                margin-bottom: 10px;
+                padding: 10px;
+            }
+            #messages li {
+                margin: 5px 0;
+                padding: 5px;
+                border-radius: 5px;
+            }
+            .my-message {
+                background-color: #e3f2fd;
+                text-align: right;
+            }
+            .other-message {
+                background-color: #f5f5f5;
+            }
+            .system-message {
+                background-color: #fff9c4;
+                text-align: center;
+                font-style: italic;
+            }
+            input {
+                padding: 8px;
+                width: 70%;
+            }
+            button {
+                padding: 8px 15px;
+                cursor: pointer;
+            }
+        </style>
     </head>
     <body>
-        <h1>Chat</h1>
-        <input
-            id="messageInput"
-            type="text"
-            placeholder="메시지를 입력하세요"
-        />
-        <button onclick="sendMessage()">전송</button>
-        <ul id="messages"></ul>
+        <h1>Chat Room</h1>
+
+        <!-- 로그인 섹션 -->
+        <div id="loginSection">
+            <h3>채팅방 입장</h3>
+            <input
+                id="nicknameInput"
+                type="text"
+                placeholder="닉네임을 입력하세요"
+            />
+            <button onclick="joinRoom()">입장</button>
+        </div>
+
+        <!-- 채팅 섹션 -->
+        <div id="chatSection">
+            <h3>환영합니다, <span id="currentUser"></span>님!</h3>
+            <ul id="messages"></ul>
+            <input
+                id="messageInput"
+                type="text"
+                placeholder="메시지를 입력하세요"
+                onkeypress="if(event.key==='Enter') sendMessage()"
+            />
+            <button onclick="sendMessage()">전송</button>
+        </div>
 
         <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
         <script>
-            // NestJS Gateway의 네임스페이스('chat')에 연결합니다.
             const socket = io('http://localhost:3030/chat');
+            let currentNickname = '';
 
-            // 서버로부터 'received_message' 이벤트를 수신합니다.
-            socket.on('received_message', (data) => {
-                const item = document.createElement('li');
-                item.textContent = data;
-                document.getElementById('messages').appendChild(item);
+            // 채팅방 입장
+            function joinRoom() {
+                const nickname = document
+                    .getElementById('nicknameInput')
+                    .value.trim();
+                if (!nickname) {
+                    alert('닉네임을 입력해주세요!');
+                    return;
+                }
+
+                currentNickname = nickname;
+                socket.emit('join_room', { nickname: nickname });
+            }
+
+            // 입장 성공
+            socket.on('join_success', (data) => {
+                document.getElementById('loginSection').style.display = 'none';
+                document.getElementById('chatSection').style.display = 'block';
+                document.getElementById('currentUser').textContent =
+                    currentNickname;
+
+                addSystemMessage(data.message);
             });
 
-            // 'message' 이벤트를 서버로 전송합니다.
+            // 다른 사용자 입장 알림
+            socket.on('user_joined', (data) => {
+                addSystemMessage(data.message);
+            });
+
+            // 다른 사용자 퇴장 알림
+            socket.on('user_left', (data) => {
+                addSystemMessage(data.message);
+            });
+
+            // 메시지 수신
+            socket.on('received_message', (data) => {
+                const item = document.createElement('li');
+                item.className = data.isOwn ? 'my-message' : 'other-message';
+                item.textContent = `${data.nickname}: ${data.message}`;
+                document.getElementById('messages').appendChild(item);
+
+                // 자동 스크롤
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            });
+
+            // 메시지 전송
             function sendMessage() {
                 const input = document.getElementById('messageInput');
-                const message = input.value;
-                socket.emit('message', { message: message }); // 객체 형태로 데이터를 보냅니다.
+                const message = input.value.trim();
+
+                if (!message) return;
+
+                socket.emit('message', { message: message });
                 input.value = '';
+            }
+
+            // 시스템 메시지 추가
+            function addSystemMessage(message) {
+                const item = document.createElement('li');
+                item.className = 'system-message';
+                item.textContent = message;
+                document.getElementById('messages').appendChild(item);
+
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }
         </script>
     </body>
