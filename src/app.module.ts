@@ -11,6 +11,7 @@ import { PostModule } from './post/post.module';
 import { ParticipationModule } from './participation/participation.module';
 import { ScrapModule } from './scrap/scrap.module';
 import { AdminModule } from './admin/admin.module';
+import { ChatModule } from './chat/chat.module';
 import { WarnModule } from './warn/warn.module';
 import databaseConfig from './common/config/database.config';
 import * as path from 'path';
@@ -31,6 +32,7 @@ import * as path from 'path';
         ParticipationModule,
         ScrapModule,
         AdminModule,
+        ChatModule,
     ],
     providers: [
         { provide: APP_FILTER, useClass: HttpExceptionFilter },
