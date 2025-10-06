@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+    <head>
+        <title>NestJS Chat</title>
+    </head>
+    <body>
+        <h1>Chat</h1>
+        <input
+            id="messageInput"
+            type="text"
+            placeholder="메시지를 입력하세요"
+        />
+        <button onclick="sendMessage()">전송</button>
+        <ul id="messages"></ul>
+
+        <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+        <script>
+            // NestJS Gateway의 네임스페이스('chat')에 연결합니다.
+            const socket = io('http://localhost:3030/chat');
+
+            // 서버로부터 'received_message' 이벤트를 수신합니다.
+            socket.on('received_message', (data) => {
+                const item = document.createElement('li');
+                item.textContent = data;
+                document.getElementById('messages').appendChild(item);
+            });
+
+            // 'message' 이벤트를 서버로 전송합니다.
+            function sendMessage() {
+                const input = document.getElementById('messageInput');
+                const message = input.value;
+                socket.emit('message', { message: message }); // 객체 형태로 데이터를 보냅니다.
+                input.value = '';
+            }
+        </script>
+    </body>
+</html>

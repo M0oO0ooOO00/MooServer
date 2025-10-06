@@ -4,6 +4,7 @@ import {
     OnGatewayConnection,
     WebSocketServer,
     MessageBody,
+    ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 
@@ -22,7 +23,12 @@ export class ChatGateway implements OnGatewayConnection {
     }
 
     @SubscribeMessage('message')
-    handleMessage(@MessageBody() data: any) {
-        this.server.emit('received_message', '서버에서 응답보냄');
+    handleMessage(@MessageBody() data: any, @ConnectedSocket() socket: Socket) {
+        // this.server.emit('received_message', '서버에서 응답보냄');
+        socket.broadcast.emit(
+            'received_message',
+            `(다른 사용자): ${data.message}`,
+        );
+        socket.emit('received_message', `(나): ${data.message}`);
     }
 }
